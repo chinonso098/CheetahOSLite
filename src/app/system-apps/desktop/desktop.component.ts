@@ -4,7 +4,7 @@ import { ProcessIDService } from 'src/app/shared/system-service/process.id.servi
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
 import { ComponentType } from 'src/app/system-files/component.types';
 import { Process } from 'src/app/system-files/process';
-import { WAVE } from './vanta-object/vanta.interfaces';
+
 import { IconsSizes, SortBys } from './desktop.enums';
 import { FileManagerService } from 'src/app/shared/system-service/file.manager.services';
 import { Colors } from './colorutil/colors';
@@ -13,11 +13,8 @@ import { TriggerProcessService } from 'src/app/shared/system-service/trigger.pro
 import { ScriptService } from 'src/app/shared/system-service/script.services';
 import { MenuService } from 'src/app/shared/system-service/menu.services';
 import { NestedMenu, NestedMenuItem } from 'src/app/shared/system-component/menu/menu.item';
-import * as htmlToImage from 'html-to-image';
 import { FileService } from 'src/app/shared/system-service/file.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-
-declare let VANTA: {WAVES: any;};
 
 @Component({
   selector: 'cos-desktop',
@@ -105,13 +102,7 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   codeEditorApp ="codeeditor";
   markDownViewerApp ="markdownviewer";
 
-  waveBkgrnd:WAVE =  {el:'#vanta'}
 
-
-  VANTAS:any = [this.waveBkgrnd];
-  private MIN_NUMS_OF_DESKTOPS = 0;
-  private MAX_NUMS_OF_DESKTOPS = this.VANTAS.length - 1;
-  private CURRENT_DESTOP_NUM = 0;
 
   private MIN_DEG = 0;
   private MAX_DEG = 360;
@@ -159,33 +150,12 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   }
 
   ngOnInit():void{
-    this._scriptService.loadScript("vanta-waves","assets/backgrounds/vanta.waves.min.js").then(() =>{
-      this._vantaEffect = VANTA.WAVES({
-        el: '#vanta',
-        color:this.defaultColor, //this._numSequence,
-        waveHeight:20,
-        shininess: 50,
-        waveSpeed:0.5,
-        zoom:0.75,     
-      });
-    })
-
     this.getDesktopMenuData();
   }
 
   ngAfterViewInit():void{
     //this.animationId = requestAnimationFrame(this.changeAnimationColor.bind(this));  
      this.hideContextMenu();
-     this.loadOtherBackgrounds();
-  }
-
-  loadOtherBackgrounds():void{
-    const names:string[] = ["rings","halo", "globe", "birds"]
-    const bkgrounds:string[] = [];
-        
-    for(let i =0; i <= bkgrounds.length - 1; i++){
-      this._scriptService.loadScript(names[i], bkgrounds[i]);
-    }
   }
 
   changeAnimationColor():void{
@@ -368,21 +338,10 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   }
 
   previousBackground():void{
-    if(this.CURRENT_DESTOP_NUM > this.MIN_NUMS_OF_DESKTOPS){
-      this.CURRENT_DESTOP_NUM --;
-      const curNum = this.CURRENT_DESTOP_NUM;
-      this.buildVantaEffect(curNum);
-    }
     this.hideContextMenu();
   }
 
   nextBackground():void{
-    if(this.CURRENT_DESTOP_NUM < this.MAX_NUMS_OF_DESKTOPS){
-      this.CURRENT_DESTOP_NUM ++;
-      const curNum = this.CURRENT_DESTOP_NUM;
-      this.buildVantaEffect(curNum);
-    }
-    
     this.hideContextMenu();
   }
 
@@ -509,17 +468,6 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   }
 
   private buildVantaEffect(n:number) {
-
-    try {
-      const vanta = this.VANTAS[n];
-      if(n == 0){
-        this._vantaEffect = VANTA.WAVES(vanta)
-      }
-    } catch (err) {
-      console.error('err:',err);
-      //this.buildVantaEffect(this.CURRENT_DESTOP_NUM);
-    }
-
   }
 
   onShowTaskBarContextMenu(data:unknown[]):void{
