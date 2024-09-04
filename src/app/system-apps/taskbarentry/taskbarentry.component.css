@@ -1,0 +1,30 @@
+li{
+    display: flex;
+    height: 100%;
+    min-width: 0;
+    margin: 0 4px;
+}
+
+figure{
+    align-items: center;
+    display: flex;
+    min-width: 0px;
+    padding: 4px;
+}
+
+/* figcaption{
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    margin-left: 4px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+} */
+
+img{
+    height: 25px;
+    width: 25px;
+    image-rendering:optimizeQuality;
+    position: relative;
+    top: 1px
+}

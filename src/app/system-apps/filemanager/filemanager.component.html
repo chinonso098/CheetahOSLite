@@ -1,0 +1,30 @@
+ <ol (dragover)="onDragOver($event)"  (drop)="onDrop($event)" (click)="onHideIconContextMenu(name)"  #myBounds> 
+    <li *ngFor="let file of files; let i = index">
+        <button (dblclick)="runProcess(file)" (mouseenter)="onMouseEnter(i)" (mouseleave)="onMouseLeave(i)"
+        ngDraggable [bounds]="myBounds" [inBounds]="true" [gridSize]="gridSize" zIndex="1" [preventDefaultEvent]="true"
+        (stopped)="onDragEnd($event)" (started)="onDragStart($event)"
+        (contextmenu)="onShowIconContextMenu($event, file, i)" (click)="onBtnClick(i)"
+        id="iconBtn{{i}}"  [style]="btnStyle">
+            <figure>
+                <img [src]="file.getIconPath | safeResourceUrl" [alt]="file.getFileName"  [style]="iconSizeStyle"/>
+                <figcaption  id="figCap{{i}}">
+                        {{file.getFileName}}
+                </figcaption>
+                <div class="rename-textbox"  id="renameContainer{{i}}">
+                    <form [formGroup]="renameForm"  (ngSubmit)="isFormDirty()">
+                        <input type="text" formControlName="renameInput"  (keypress)="onInputChange($event)" autofocus spellcheck="false" id="renameTxtBox{{i}}"/>
+                    </form>
+                </div>
+            </figure>
+        </button>
+    </li>
+
+    <div class="tool-tip-container" id="invalidChars">
+        <div class="tool-tip-arrow"> </div>
+        <div class="tool-tip-base"> A file name can't contain any of the following characters: <br /><br />
+             \ / : * ? " < > |
+        </div>
+    </div>
+
+    <cos-menu [generalMenu]="menuData" *ngIf="showCntxtMenu" [style]="iconCntxtMenuStyle" [menuType]="fileExplrMngrMenuOption"> </cos-menu>
+</ol>
