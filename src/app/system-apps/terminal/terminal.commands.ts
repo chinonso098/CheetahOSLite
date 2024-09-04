@@ -1,13 +1,6 @@
-import { TerminalCommand } from "./model/terminal.command";
-import { AppDirectory } from "src/app/system-files/app.directory";
-import { TriggerProcessService } from "src/app/shared/system-service/trigger.process.service";
 import { FileInfo } from "src/app/system-files/fileinfo";
-import { RunningProcessService } from "src/app/shared/system-service/running.process.service";
-import { StateManagmentService } from "src/app/shared/system-service/state.management.service";
-import {extname, basename, resolve, dirname} from 'path';
 import { FileService } from "src/app/shared/system-service/file.service";
 import { FileEntry } from 'src/app/system-files/fileentry';
-
 
 export interface OctalRepresentation {
     symbolic:string;
@@ -22,20 +15,11 @@ export class TerminalCommands{
     private  permissionChart!:Map<number, OctalRepresentation>;
     private files:FileInfo[] = [];
     private currentDirectoryPath = '/';
-    private fallBackDirPath = '';
 
     constructor() { 
         this._fileService = FileService.instace;
         this.permissionChart = new Map<number, OctalRepresentation>();
         this.genPermissionsRepresentation();
-    }
-
-    help(arg0:string[], arg1:string[],arg2:string):string{
-        return '';
-    }
-
-    clear(arg:TerminalCommand[]):void{
-        arg = [];
     }
 
     addspaces(arg:string, maxSpace = 21):string{
@@ -135,12 +119,7 @@ ${(file.getIsFile)? '-':'d'}${this.addspaces(strPermission,10)} ${this.addspaces
 
 
     async cp(sourceArg:string, destinationArg:string):Promise<string>{
-
-        console.log(`copy-source ${sourceArg}`);
-        console.log(`copy-destination ${sourceArg}`);
-        //console.log(`destination ${destinationArg}`);
-
-        const folderQueue:string[] = []
+        const folderQueue:string[] = [];
 
         const isDirectory = await this._fileService.checkIfDirectory(sourceArg);
         if(isDirectory){
