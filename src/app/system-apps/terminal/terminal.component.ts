@@ -27,14 +27,8 @@ export class TerminalComponent implements BaseComponent, OnInit, AfterViewInit, 
   private _formBuilder;
   private _terminaCommandsImpl!:TerminalCommands;
 
-  private msgPosCounter = 0;
-  private scrollCounter = 0
-  private prevPtrIndex = 0;
   private versionNum = '1.0.4';
-  private SECONDS_DELAY:number[] = [120,250];
-  
 
-  
   Success = 1;
   Fail = 2;
   Warning = 3;
@@ -71,8 +65,6 @@ export class TerminalComponent implements BaseComponent, OnInit, AfterViewInit, 
     this._runningProcessService = runningProcessService;
     this._formBuilder = formBuilder;
     this._terminaCommandsImpl = new TerminalCommands();
-
-    this.retrievePastSessionData();
 
     this.processId = this._processIdService.getNewProcessId()
     this._runningProcessService.addProcess(this.getComponentDetail()); 
@@ -127,9 +119,6 @@ export class TerminalComponent implements BaseComponent, OnInit, AfterViewInit, 
     }
   }
 
-  private scrollToBottom(): void {
-  }
-
   async onKeyDoublePressed(evt: KeyboardEvent): Promise<void> {
     console.log(`${evt.key} Key pressed  rapidly.`);
   }
@@ -146,16 +135,10 @@ export class TerminalComponent implements BaseComponent, OnInit, AfterViewInit, 
       if(cmdInput !== ''){
         this.processCommand(terminalCommand, "Enter");
         this.commandHistory.push(terminalCommand);
-        this.prevPtrIndex = this.commandHistory.length;
         this.terminalForm.reset();
       }
       evt.preventDefault();
     }
-  }
-
-
-  getCommandHistory(direction:string):void{
-    let currPtrIndex = 0;
   }
 
   isInAllCommands(arg: string): boolean {
@@ -212,9 +195,6 @@ export class TerminalComponent implements BaseComponent, OnInit, AfterViewInit, 
       terminalCmd.setResponseCode = this.Fail;
       terminalCmd.setCommandOutput = `${terminalCmd.getCommand}: command not found. Type 'help', or 'help -verbose' to view a list of available commands.`;
     }
-
-    this.scrollToBottom();
-    this.storeAppState();
   }
 
   /***
@@ -235,12 +215,6 @@ export class TerminalComponent implements BaseComponent, OnInit, AfterViewInit, 
 
   setTerminalWindowToFocus(pid:number):void{
     this._runningProcessService.focusOnCurrentProcessNotify.next(pid);
-  }
-
-  storeAppState():void{
-  }
-
-  retrievePastSessionData():void{
   }
 
   private getComponentDetail():Process{
