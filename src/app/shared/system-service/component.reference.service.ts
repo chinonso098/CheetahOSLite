@@ -18,7 +18,7 @@ export class ComponentReferenceService{
 
     getComponentReference(processId:number):ComponentRef<unknown>{
         const componentRef = this._componentsReferences.get(processId);
-   
+
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return componentRef!;
     }
