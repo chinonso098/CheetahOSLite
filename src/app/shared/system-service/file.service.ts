@@ -13,7 +13,7 @@ import ini  from 'ini';
 import OSFileSystemIndex from '../../../../index.json';
 import {configure, fs, Overlay, Fetch} from '@zenfs/core';
 import {IndexedDB} from '@zenfs/dom';
-import { IndexData } from "@zenfs/core/backends/index/index.js";
+import { IndexData } from "@zenfs/core";
 
 @Injectable({
     providedIn: 'root'
@@ -39,11 +39,13 @@ export class FileService{
 		if (this._isFileSystemInit) {
 			return;
 		}
-		await configure<typeof Overlay>({
+		await configure({
 			mounts: {
 				'/': {
 					backend: Overlay,
-					readable: { backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'osdrive' },
+                    //@ts-expect-error
+					readable: { backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'http://localhost:4200/osdrive' },
+                     //@ts-expect-error
 					writable: { backend: IndexedDB, storeName: 'fs-cache' },
 				},
 			},
@@ -105,6 +107,7 @@ export class FileService{
 		/** This is where ZenFS is initialized */
 		await this.initZenFSAsync();
 		return await fs.promises.readdir(path);
+        //return [''];
 
 	}
 

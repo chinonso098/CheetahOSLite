@@ -122,7 +122,7 @@ export class FileManagerComponent implements BaseComponent, OnInit, AfterViewIni
   }
 
   async ngAfterViewInit():Promise<void>{
-    await this.loadFilesInfoAsync();
+   await this.loadFilesInfoAsync();
   }
 
   ngOnDestroy(): void {
@@ -156,6 +156,7 @@ export class FileManagerComponent implements BaseComponent, OnInit, AfterViewIni
     this.files = [];
     this._fileService.resetDirectoryFiles();
     const directoryEntries  = await this._fileService.getEntriesFromDirectoryAsync(this.directory);
+    console.log('filemanager-runProcess:',directoryEntries);
     this._directoryFilesEntries = this._fileService.getFileEntriesFromDirectory(directoryEntries,this.directory);
 
     for(let i = 0; i < directoryEntries.length; i++){
