@@ -40,15 +40,29 @@ export class FileService{
 			return;
 		}
 		await configure({
-			mounts: {
-				'/': {
-					backend: Overlay,
-                    //@ts-expect-error
-					readable: { backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'http://localhost:4200/osdrive' },
-                     //@ts-expect-error
-					writable: { backend: IndexedDB, storeName: 'fs-cache' },
-				},
-			},
+			// mounts: {
+			// 	'/': {
+			// 		backend: Overlay,
+            //         //@ts-expect-error
+			// 		readable: { backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'http://localhost:4200/osdrive' },
+            //          //@ts-expect-error
+			// 		writable: { backend: IndexedDB, storeName: 'fs-cache' },
+			// 	},
+			// },
+
+            mounts: {
+                    '/' : {
+                    backend: Fetch,
+                    baseUrl: 'http://localhost:4200/osdrive',
+                    index:  OSFileSystemIndex as IndexData,
+                }
+            },
+            // log: {
+            //     enabled: true,
+            //     level: 'debug',
+            //     output: console.log,
+            //     format: log.formats.css_message, // or log.formats.css_level
+            // }
 		});
 		this._isFileSystemInit = true;
 	}
