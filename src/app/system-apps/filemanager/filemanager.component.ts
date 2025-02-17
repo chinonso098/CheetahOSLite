@@ -218,13 +218,13 @@ export class FileManagerComponent implements BaseComponent, OnInit, AfterViewIni
 
   onCopy():void{
     const action = 'copy';
-    const path = this.selectedFile.getCurrentPath;
+    const path = this.selectedFile.currentPath;
     this._menuService.storeData.next([path, action]);
   }
 
   onCut():void{
     const action = 'cut';
-    const path = this.selectedFile.getCurrentPath;
+    const path = this.selectedFile.currentPath;
     this._menuService.storeData.next([path, action]);
   }
   pinIconToTaskBar():void{
@@ -351,16 +351,16 @@ export class FileManagerComponent implements BaseComponent, OnInit, AfterViewIni
 
   sortIcons(sortBy:string):void {
     if(sortBy === "Size"){
-      this.files = this.files.sort((objA, objB) => objB.getSize - objA.getSize);
+      this.files = this.files.sort((objA, objB) => objB.size - objA.size);
     }else if(sortBy === "Date Modified"){
-      this.files = this.files.sort((objA, objB) => objB.getDateModified.getTime() - objA.getDateModified.getTime());
+      this.files = this.files.sort((objA, objB) => objB.dateModified.getTime() - objA.dateModified.getTime());
     }else if(sortBy === "Name"){
       this.files = this.files.sort((objA, objB) => {
-        return objA.getFileName < objB.getFileName ? -1 : 1;
+        return objA.fileName < objB.fileName ? -1 : 1;
       });
     }else if(sortBy === "Item Type"){
       this.files = this.files.sort((objA, objB) => {
-        return objA.getFileType < objB.getFileType ? -1 : 1;
+        return objA.fileType < objB.fileType ? -1 : 1;
       });
     }
   }
@@ -505,7 +505,7 @@ export class FileManagerComponent implements BaseComponent, OnInit, AfterViewIni
 
     if(renameContainerElement){
       renameContainerElement.style.display = 'block';
-      this.currentIconName = this.selectedFile.getFileName;
+      this.currentIconName = this.selectedFile.fileName;
       this.renameForm.setValue({
         renameInput:this.currentIconName
       })

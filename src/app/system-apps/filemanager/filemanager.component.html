@@ -6,9 +6,9 @@
         (contextmenu)="onShowIconContextMenu($event, file, i)" (click)="onBtnClick(i)"
         id="iconBtn{{i}}"  [style]="btnStyle">
             <figure>
-                <img [src]="file.getIconPath | safeResourceUrl" [alt]="file.getFileName"  [style]="iconSizeStyle"/>
+                <img [src]="file.iconPath | safeResourceUrl" [alt]="file.fileName"  [style]="iconSizeStyle"/>
                 <figcaption  id="figCap{{i}}">
-                        {{file.getFileName}}
+                        {{file.fileName}}
                 </figcaption>
                 <div class="rename-textbox"  id="renameContainer{{i}}">
                     <form [formGroup]="renameForm"  (ngSubmit)="isFormDirty()">

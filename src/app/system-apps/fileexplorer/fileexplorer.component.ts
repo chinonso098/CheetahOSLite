@@ -212,8 +212,8 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
     if(this._fileInfo){
       // is this a URL or and Actual Folder
-      if(this._fileInfo.getOpensWith === 'fileexplorer' && !this._fileInfo.getIsFile) //Actual Folder
-         this.directory = this._fileInfo.getCurrentPath;
+      if(this._fileInfo.opensWith === 'fileexplorer' && !this._fileInfo.isFile) //Actual Folder
+         this.directory = this._fileInfo.currentPath;
     }
 
     this.renameForm = this._formBuilder.nonNullable.group({
@@ -671,7 +671,7 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
     console.log('fileexplorer-runProcess:',file)
     this.showInformationTip = false;
     // console.log('what was clicked:',file.getFileName +'-----' + file.getOpensWith +'---'+ file.getCurrentPath +'----'+ file.getIcon) TBD
-    if((file.getOpensWith === 'fileexplorer' && file.getFileName !== 'fileexplorer') && file.getFileType ==='folder'){
+    if((file.opensWith === 'fileexplorer' && file.fileName !== 'fileexplorer') && file.fileType ==='folder'){
 
       if(!this.isNavigatedBefore){
         this.prevPathEntries.push(this.directory);
@@ -680,9 +680,9 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
       }
 
       this.isPrevBtnActive = true;
-      this.directory = file.getCurrentPath;
-      this.displayName = file.getFileName;
-      this.icon = file.getIconPath;
+      this.directory = file.currentPath;
+      this.displayName = file.fileName;
+      this.icon = file.iconPath;
 
       this.prevPathEntries.push(this.directory);
       this.upPathEntries.push(this.directory);
@@ -692,8 +692,8 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
       }
 
       this.populateHopsList();
-      this.setNavPathIcon(file.getFileName, file.getCurrentPath);
-      this.storeAppState(file.getCurrentPath);
+      this.setNavPathIcon(file.fileName, file.currentPath);
+      this.storeAppState(file.currentPath);
   
       await this.loadFilesInfoAsync();
     }else{
@@ -943,13 +943,13 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
   onCopy():void{
     const action = 'copy';
-    const path = this.selectedFile.getCurrentPath;
+    const path = this.selectedFile.currentPath;
     this._menuService.storeData.next([path, action]);
   }
 
   onCut():void{
     const action = 'cut';
-    const path = this.selectedFile.getCurrentPath;
+    const path = this.selectedFile.currentPath;
     this._menuService.storeData.next([path, action]);
   }
   
@@ -1046,16 +1046,16 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
   sortIcons(sortBy:string): void {
     if(sortBy === "Size"){
-      this.files = this.files.sort((objA, objB) => objB.getSize - objA.getSize);
+      this.files = this.files.sort((objA, objB) => objB.size - objA.size);
     }else if(sortBy === "Date Modified"){
-      this.files = this.files.sort((objA, objB) => objB.getDateModified.getTime() - objA.getDateModified.getTime());
+      this.files = this.files.sort((objA, objB) => objB.dateModified.getTime() - objA.dateModified.getTime());
     }else if(sortBy === "Name"){
       this.files = this.files.sort((objA, objB) => {
-        return objA.getFileName < objB.getFileName ? -1 : 1;
+        return objA.fileName < objB.fileName ? -1 : 1;
       });
     }else if(sortBy === "Item Type"){
       this.files = this.files.sort((objA, objB) => {
-        return objA.getFileType < objB.getFileType ? -1 : 1;
+        return objA.fileType < objB.fileType ? -1 : 1;
       });
     }
   }
@@ -1096,22 +1096,22 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
     const infoTipFields = ['Author:', 'Item type:','Date created:','Date modified:', 'Dimesions:', 'General', 'Size:','Type:'];
     const fileAuthor = 'Relampago Del Catatumbo';
-    const fileType = file.getFileType;
-    const fileDateModified = file.getDateModifiedUS;
-    const fileSize = `${String(file.getSize1)}  ${file.getFileSizeUnit}`;
-    const fileName = file.getFileName;
+    const fileType = file.fileType;
+    const fileDateModified = file.dateModifiedUS;
+    const fileSize = `${String(file.size1)}  ${file.fileSizeUnit}`;
+    const fileName = file.fileName;
 
     //reset
     this.fileInfoTipData = [];
 
-    if(IMAGE_FILE_EXTENSIONS.includes(file.getFileType)){
+    if(IMAGE_FILE_EXTENSIONS.includes(file.fileType)){
       const img = new Image();
-      img.src = file.getIconPath;
+      img.src = file.iconPath;
       const width = img?.naturalWidth;
       const height = img?.naturalHeight;
       const imgDimesions = `${width} x ${height}`;
 
-      this.fileInfoTipData.push({label:infoTipFields[1], data:`${file.getFileType.replace('.','').toLocaleUpperCase()} File`});
+      this.fileInfoTipData.push({label:infoTipFields[1], data:`${file.fileType.replace('.','').toLocaleUpperCase()} File`});
       this.fileInfoTipData.push({label:infoTipFields[4], data:imgDimesions })
       this.fileInfoTipData.push({label:infoTipFields[6], data:fileSize })
     }
@@ -1382,7 +1382,7 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
     if(renameContainerElement){
       renameContainerElement.style.display = 'block';
-      this.currentIconName = this.selectedFile.getFileName;
+      this.currentIconName = this.selectedFile.fileName;
       this.renameForm.setValue({
         renameInput:this.currentIconName
       })

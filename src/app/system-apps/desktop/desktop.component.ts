@@ -380,11 +380,11 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   openApplication(arg0:string):void{
     const file = new FileInfo();
 
-    file.setOpensWith = arg0;
+    file.opensWith = arg0;
 
     if(arg0 ==  this.markDownViewerApp){
-      file.setCurrentPath = '/Desktop';
-      file.setContentPath = '/Documents/Credits.md';
+      file.currentPath = '/Desktop';
+      file.contentPath = '/Documents/Credits.md';
     }
 
     this._triggerProcessService.startApplication(file);
@@ -526,11 +526,11 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   countInstaceAndSetMenu():number{
     const file = this.selectedFileFromTaskBar;
     const processCount = this._runningProcessService.getProcesses()
-      .filter(p => p.getProcessName === file.getOpensWith).length;
+      .filter(p => p.getProcessName === file.opensWith).length;
 
     const rowZero = this.taskBarMenuData[0];
-    rowZero.icon = file.getIconPath;
-    rowZero.label = file.getOpensWith;
+    rowZero.icon = file.iconPath;
+    rowZero.label = file.opensWith;
     this.taskBarMenuData[0] = rowZero;
 
     if(processCount == 1){
@@ -561,7 +561,7 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
     this.showTskBarCntxtMenu = false;
     const file = this.selectedFileFromTaskBar;
     const proccesses = this._runningProcessService.getProcesses()
-      .filter(p => p.getProcessName === file.getOpensWith);
+      .filter(p => p.getProcessName === file.opensWith);
 
     this._menuService.closeApplicationFromTaskBar.next(proccesses);
   }

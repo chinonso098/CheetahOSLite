@@ -84,7 +84,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
   }
 
   pinIconToTaskBarList(file:FileInfo):void{
-    if(!this.pinToTaskBarList.some(x => x.getOpensWith === file.getOpensWith))
+    if(!this.pinToTaskBarList.some(x => x.opensWith === file.opensWith))
         this.pinToTaskBarList.push(file);
 
     this.updateRunningProcess();
@@ -93,7 +93,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
   unPinIconFromTaskBarList(file:FileInfo):void{
     const deleteCount = 1;
     const procIndex = this.pinToTaskBarList.findIndex((pin) => {
-        return pin.getOpensWith === file.getOpensWith;
+        return pin.opensWith === file.opensWith;
       });
 
     if(procIndex != -1){
@@ -115,7 +115,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
      * else, put object in a different list
      */
     uniqueProccesses.forEach(x =>{
-      if(this.pinToTaskBarList.some( i => i.getOpensWith === x.getProcessName)){
+      if(this.pinToTaskBarList.some( i => i.opensWith === x.getProcessName)){
         this.appProcessId = x.getProcessId;
         this.setIconState(x.getProcessName,true);
       }else{
@@ -175,11 +175,11 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
   onPinnedAppIconClick(file:FileInfo):void{
     // check if the give app is running
     // if it isn't running, then trigger it
-    if(!this._runningProcessService.isProcessRunning(file.getOpensWith)){
+    if(!this._runningProcessService.isProcessRunning(file.opensWith)){
       this._triggerProcessService.startApplication(file);
       return;
     }else{
-      const process = this._runningProcessService.getProcesses().filter(x => x.getProcessName === file.getOpensWith);
+      const process = this._runningProcessService.getProcesses().filter(x => x.getProcessName === file.opensWith);
       this._runningProcessService.restoreOrMinimizeWindowNotify.next(process[0].getProcessId);
     }
   }
@@ -198,7 +198,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
     /* My hand was forced, I had to let the desktop display the taskbar context menu.
      * This is due to the fact that the taskbar has a max height of 40px, which is not enough room to display the context menu
      */
-    const liElemnt = document.getElementById(`tskbar-${file.getOpensWith}`) as HTMLElement;
+    const liElemnt = document.getElementById(`tskbar-${file.opensWith}`) as HTMLElement;
     const rect =  liElemnt.getBoundingClientRect();
     const isPinned = true;
     const data:unknown[] = [rect, file, isPinned];
@@ -214,10 +214,10 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
   onShowUnPinnedIconContextMenu(evt:MouseEvent, proccess:Process):void{
 
     const file = new FileInfo();
-    file.setOpensWith = proccess.getProcessName;
-    file.setIconPath = proccess.getIcon;
+    file.opensWith = proccess.getProcessName;
+    file.iconPath = proccess.getIcon;
 
-    const liElemnt = document.getElementById(`tskbar-UnPinned-${file.getOpensWith}`) as HTMLElement;
+    const liElemnt = document.getElementById(`tskbar-UnPinned-${file.opensWith}`) as HTMLElement;
     const rect =  liElemnt.getBoundingClientRect();
     const isPinned = false;
     const data:unknown[] = [rect, file, isPinned];

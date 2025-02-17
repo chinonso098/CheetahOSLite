@@ -30,22 +30,22 @@ export class TriggerProcessService{
 
     startApplication(file:FileInfo):void{
         let msg = '';
-        if(this._appDirectory.appExist(file.getOpensWith)){
+        if(this._appDirectory.appExist(file.opensWith)){
 
-            if(!this._runningProcessService.isProcessRunning(file.getOpensWith) || 
-                (this._runningProcessService.isProcessRunning(file.getOpensWith) && !this._onlyOneInstanceAllowed.includes(file.getOpensWith))){
-                this.startProcessNotify.next(file.getOpensWith);
+            if(!this._runningProcessService.isProcessRunning(file.opensWith) || 
+                (this._runningProcessService.isProcessRunning(file.opensWith) && !this._onlyOneInstanceAllowed.includes(file.opensWith))){
+                this.startProcessNotify.next(file.opensWith);
                 this._TriggerList.push(file);
                 return;
             }else{
-                if(this._onlyOneInstanceAllowed.includes(file.getOpensWith)){
-                    msg = `Only one instance of ${file.getOpensWith} is allowed to run.`;
+                if(this._onlyOneInstanceAllowed.includes(file.opensWith)){
+                    msg = `Only one instance of ${file.opensWith} is allowed to run.`;
                     this.appIsRunningNotify.next(msg);
                     return;
                 }             
             }
         }
-        msg = `Osdrive:/App Directory/${file.getOpensWith}`;
+        msg = `Osdrive:/App Directory/${file.opensWith}`;
         this.appNotFoundNotify.next(msg);
         return;
     }

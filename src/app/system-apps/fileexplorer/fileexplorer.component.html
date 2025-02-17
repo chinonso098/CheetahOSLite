@@ -275,10 +275,10 @@
     
                                     <figure class="figure-icon-size-view" id="figElmnt-{{this.processId}}-{{i}}">
     
-                                        <img class="img-icon-size-view" [src]="file.getIconPath | safeResourceUrl" [alt]="file.getFileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
+                                        <img class="img-icon-size-view" [src]="file.iconPath | safeResourceUrl" [alt]="file.fileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
     
                                         <figcaption class="figcaption-icon-size-view" id="figCapElmnt-{{this.processId}}-{{i}}">
-                                                {{file.getFileName  | truncateString}} 
+                                                {{file.fileName  | truncateString}} 
                                         </figcaption>
     
                                         <div class="rename-textbox"  id="renameContainer-{{this.processId}}-{{i}}">
@@ -298,11 +298,11 @@
     
                                     <span class="span-list-view">
                                         <figure class="figure-list-view">
-                                            <img class="img-list-view" [src]="file.getIconPath | safeResourceUrl" [alt]="file.getFileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
+                                            <img class="img-list-view" [src]="file.iconPath | safeResourceUrl" [alt]="file.fileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
                                         </figure>
     
                                         <figcaption class="figcaption-list-view" id="figCapElmnt-{{this.processId}}-{{i}}">
-                                            {{file.getFileName  | truncateString}} 
+                                            {{file.fileName  | truncateString}} 
                                         </figcaption>
                                         <div class="rename-textbox"  id="renameContainer-{{this.processId}}-{{i}}">
                                             <form [formGroup]="renameForm"  (ngSubmit)="isFormDirty()">
@@ -323,21 +323,21 @@
                                     (contextmenu)="onShowIconContextMenu($event, file, i)" (click)="onBtnClick(i)" id="btnElmnt-{{this.processId}}-{{i}}">
                                     <span class="span-content-view">
                                         <figure class="figure-content-view" id="figElmnt-{{this.processId}}-{{i}}">
-                                            <img class="img-content-view" [src]="file.getIconPath | safeResourceUrl" [alt]="file.getFileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
+                                            <img class="img-content-view" [src]="file.iconPath | safeResourceUrl" [alt]="file.fileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
                                         </figure>
     
                                         <div class="div-content-view">
                                             <figcaption class="figcaption-content-view"   id="figCapElmnt-{{this.processId}}-{{i}}">
-                                                {{file.getFileName  | truncateString}} 
+                                                {{file.fileName  | truncateString}} 
                                             </figcaption>
     
-                                            <div class="div-extra-info-cntnr" *ngIf="!file.getIsFile, else elseBlock">
-                                                <div class="div-extra-info-content">Date modified: {{file.getDateModifiedUS}} </div>
+                                            <div class="div-extra-info-cntnr" *ngIf="!file.isFile, else elseBlock">
+                                                <div class="div-extra-info-content">Date modified: {{file.dateModifiedUS}} </div>
                                             </div>
                                             <ng-template #elseBlock>
                                                 <div class="div-extra-info-cntnr">
-                                                    <div class="div-extra-info-content">Date modified: {{file.getDateModifiedUS}} </div>
-                                                    <div class="div-extra-info-content">{{file.getSize1}} {{file.getFileSizeUnit}} </div>
+                                                    <div class="div-extra-info-content">Date modified: {{file.dateModifiedUS}} </div>
+                                                    <div class="div-extra-info-content">{{file.size1}} {{file.fileSizeUnit}} </div>
                                                 </div>
                                             </ng-template>
     
@@ -358,11 +358,11 @@
                                     (contextmenu)="onShowIconContextMenu($event, file, i)" (click)="onBtnClick(i)" id="btnElmnt-{{this.processId}}-{{i}}">
                                     <span class="span-tiles-view">
                                         <figure class="figure-tiles-view">
-                                            <img class="img-tiles-view" [src]="file.getIconPath | safeResourceUrl" [alt]="file.getFileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
+                                            <img class="img-tiles-view" [src]="file.iconPath | safeResourceUrl" [alt]="file.fileName" id="imgElmnt-{{this.processId}}-{{i}}"/>
                                         </figure>
     
-                                        <figcaption *ngIf="!file.getIsFile, else elseBlock" class="figcaption-tiles-view" id="figCapElmnt-{{this.processId}}-{{i}}">
-                                            {{file.getFileName  | truncateString}} 
+                                        <figcaption *ngIf="!file.isFile, else elseBlock" class="figcaption-tiles-view" id="figCapElmnt-{{this.processId}}-{{i}}">
+                                            {{file.fileName  | truncateString}} 
                                         </figcaption>
                                         <ng-template #elseBlock>
                                             <div class="figcaption-title-view-cntnr">
@@ -372,9 +372,9 @@
                                                     </form>
                                                 </div>
                                                 <div class="div-figcaption-tiles-view-cntnr">
-                                                    <div class="div-figcaption-tiles-view" id="figCapElmnt-{{this.processId}}-{{i}}">{{file.getFileName}}</div>
-                                                    <div class="div-figcaption-tiles-view">{{file.getFileType}}</div>
-                                                    <div class="div-figcaption-tiles-view">{{file.getSize1}} {{file.getFileSizeUnit}}</div>
+                                                    <div class="div-figcaption-tiles-view" id="figCapElmnt-{{this.processId}}-{{i}}">{{file.fileName}}</div>
+                                                    <div class="div-figcaption-tiles-view">{{file.fileType}}</div>
+                                                    <div class="div-figcaption-tiles-view">{{file.size1}} {{file.fileSizeUnit}}</div>
                                                 </div>
                                             </div>
                                         </ng-template>

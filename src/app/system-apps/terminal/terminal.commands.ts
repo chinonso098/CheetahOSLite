@@ -79,7 +79,7 @@ export class TerminalCommands{
             if(arg0 == undefined || arg0 == ''){
                 const onlyFileNames:string[] = [];
                 this.files.forEach(file => {
-                    onlyFileNames.push(file.getFileName);
+                    onlyFileNames.push(file.fileName);
                 });
                 return {type:'string[]', result:onlyFileNames};
             }
@@ -95,14 +95,14 @@ export class TerminalCommands{
                 splitOptions.forEach(i => {
                     // sort by time
                     if( i === 't'){
-                       this.files = this.files.sort((objA, objB) => objB.getDateModified.getTime() -  objA.getDateModified.getTime());
+                       this.files = this.files.sort((objA, objB) => objB.dateModified.getTime() -  objA.dateModified.getTime());
                     }else if( i  === 'r'){ // reverse the order
                         this.files.reverse();
                     }else{ // present in list format
                         this.files.forEach(file => {
-                            const strPermission =this.getPermission(file.getMode);
+                            const strPermission =this.getPermission(file.mode);
                             const fileInfo = `
-${(file.getIsFile)? '-':'d'}${this.addspaces(strPermission,10)} ${this.addspaces('Terminal',8)} ${this.addspaces('staff', 6)} ${this.addspaces(String(file.getSize),6)}  ${this.addspaces(file.getDateTimeModifiedUS,12)} ${this.addspaces(file.getFileName,11)}
+${(file.isFile)? '-':'d'}${this.addspaces(strPermission,10)} ${this.addspaces('Terminal',8)} ${this.addspaces('staff', 6)} ${this.addspaces(String(file.size),6)}  ${this.addspaces(file.dateTimeModifiedUS,12)} ${this.addspaces(file.fileName,11)}
                         `
                             result.push(fileInfo);
                         });
