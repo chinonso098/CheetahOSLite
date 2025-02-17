@@ -16,7 +16,8 @@
 		"watch": "ng build --watch --configuration development",
 		"lint": "ng lint",
 		"prepare": "husky install",
-		"test": "jest"
+		"test": "jest",
+		"format": "npx prettier --write ."
 	},
 	"husky": {
 		"hooks": {
@@ -78,6 +79,7 @@
 		"karma-coverage": "~2.2.0",
 		"lint-staged": "^15.4.3",
 		"path-browserify": "^1.0.1",
+		"prettier": "^3.5.1",
 		"typescript": "^5.7.2",
 		"url": "^0.11.0"
 	}
