@@ -13,8 +13,9 @@ import {
 	configure,
 	CopyOnWrite,
 	Fetch,
-	fs,
+	default as fs,
 	resolveMountConfig,
+	type ErrnoError,
 	type IndexData,
 } from '@zenfs/core';
 
@@ -22,22 +23,29 @@ import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
 /// <reference types="node" />
 
-const fsReady = configure({
-	mounts: {
-		'/': {
-			backend: CopyOnWrite,
-			readable: await resolveMountConfig({
-				backend: Fetch,
-				index: OSFileSystemIndex as IndexData,
-				baseUrl: 'http://localhost:4200/osdrive',
-			}),
-			writable: await resolveMountConfig({
-				backend: IndexedDB,
-				storeName: 'fs-cache',
-			}),
+const configured = (async () =>
+	await configure({
+		mounts: {
+			'/': {
+				backend: CopyOnWrite,
+				readable: await resolveMountConfig({
+					backend: Fetch,
+					index: OSFileSystemIndex as IndexData,
+					baseUrl: 'http://localhost:4200/osdrive',
+				}),
+				writable: await resolveMountConfig({
+					backend: IndexedDB,
+					storeName: 'fs-cache',
+				}),
+			},
 		},
-	},
-});
+	}))();
+
+function throwWithPath(error: ErrnoError): never {
+	// We want the path in the message, since Angular won't throw the actual error.
+	error.message = error.toString();
+	throw error;
+}
 
 export const dirFilesReadyNotify: Subject<void> = new Subject<void>();
 export const dirFilesUpdateNotify: Subject<void> = new Subject<void>();
@@ -46,30 +54,33 @@ async function changeFolderIcon(
 	fileName: string,
 	iconPath: string
 ): Promise<string> {
-	await fsReady;
+	await configured;
 	const baseUrl = '/osdrive';
 	const iconMaybe = `/icons/${fileName.toLocaleLowerCase()}_folder.ico`;
 	return fs.existsSync(iconMaybe) ? `${baseUrl}${iconMaybe}` : iconPath;
 }
 
 export async function checkIfDirectory(path: string): Promise<boolean> {
-	await fsReady;
-	return (await fs.promises.stat(path)).isDirectory();
+	await configured;
+	const stats = await fs.promises.stat(path).catch(throwWithPath);
+	return stats.isDirectory();
 }
 
 export async function checkIfExistsAsync(dirPath: string): Promise<boolean> {
-	await fsReady;
-	return fs.promises.exists(dirPath);
+	await configured;
+	return fs.promises.exists(dirPath).catch(throwWithPath);
 }
 
 export async function copyFileAsync(
 	sourcePath: string,
 	destinationPath: string
 ): Promise<boolean> {
-	await fsReady;
+	await configured;
 	const fileName = basename(sourcePath);
 	console.log(`Destination: ${destinationPath}/${fileName}`);
-	await fs.promises.copyFile(sourcePath, `${destinationPath}/${fileName}`);
+	await fs.promises
+		.copyFile(sourcePath, `${destinationPath}/${fileName}`)
+		.catch(throwWithPath);
 	return true;
 }
 
@@ -101,8 +112,8 @@ export async function copyHandler(
 }
 
 export async function getExtraFileMetaDataAsync(path: string) {
-	await fsReady;
-	const stats = await fs.promises.stat(path);
+	await configured;
+	const stats = await fs.promises.stat(path).catch(throwWithPath);
 	return new FileMetaData(stats.ctime, stats.mtime, stats.size, stats.mode);
 }
 
@@ -116,8 +127,8 @@ export async function getEntriesFromDirectoryAsync(
 		return Promise.reject(new Error('Path must not be empty'));
 	}
 
-	await fsReady;
-	return await fs.promises.readdir(path);
+	await configured;
+	return await fs.promises.readdir(path).catch(throwWithPath);
 }
 
 export function getFileEntriesFromDirectory(
@@ -228,8 +239,8 @@ export async function getShortCutFromB64DataUrlAsync(
 	path: string,
 	contentType: string
 ): Promise<ShortCut> {
-	await fsReady;
-	const contents = await fs.promises.readFile(path);
+	await configured;
+	const contents = await fs.promises.readFile(path).catch(throwWithPath);
 
 	const stringData = contents.toString('utf-8');
 	if (!isUtf8Encoded(stringData)) {
@@ -274,8 +285,8 @@ export async function getShortCutFromB64DataUrlAsync(
 }
 
 export async function getShortCutFromURLAsync(path: string): Promise<ShortCut> {
-	await fsReady;
-	const contents = await fs.promises.readFile(path);
+	await configured;
+	const contents = await fs.promises.readFile(path).catch(throwWithPath);
 
 	const stage = contents ? contents.toString() : Buffer.from('').toString();
 	const shortCut = (ini.parse(stage) as unknown) || {
@@ -318,8 +329,8 @@ export async function getShortCutFromURLAsync(path: string): Promise<ShortCut> {
 }
 
 export async function setFolderValuesAsync(path: string): Promise<ShortCut> {
-	await fsReady;
-	const exists = await fs.promises.exists(path);
+	await configured;
+	const exists = await fs.promises.exists(path).catch(throwWithPath);
 
 	if (!exists) {
 		return {
@@ -331,11 +342,8 @@ export async function setFolderValuesAsync(path: string): Promise<ShortCut> {
 		};
 	}
 
-	const stats = await fs.promises.stat(path);
-	const isDirectory = stats?.isDirectory();
-	const iconFile = `/osdrive/icons/${
-		isDirectory ? 'folder.ico' : 'unknown.ico'
-	}`;
+	const stats = await fs.promises.stat(path).catch(throwWithPath);
+	const iconFile = `/osdrive/icons/${stats.isDirectory() ? 'folder.ico' : 'unknown.ico'}`;
 	const fileType = 'folder';
 	const opensWith = 'fileexplorer';
 	return {
