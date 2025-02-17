@@ -9,7 +9,9 @@ import { Buffer } from 'buffer';
 import ini from 'ini';
 import { Subject } from 'rxjs';
 
-import { configure, CopyOnWrite, Fetch, fs, resolveMountConfig, type IndexData } from '@zenfs/core';
+import { configure, fs, CopyOnWrite, Fetch, resolveMountConfig, type IndexData } from '@zenfs/core';
+(globalThis as any).fs = (globalThis as any).__zenfs__;
+
 import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
 /// <reference types="node" />
@@ -18,7 +20,7 @@ await configure({
 	mounts: {
 		'/': {
 			backend: CopyOnWrite,
-			readable: await resolveMountConfig({ backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'osdrive' }),
+			readable: await resolveMountConfig({ backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'http://localhost:4200/osdrive' }),
 			writable: await resolveMountConfig({ backend: IndexedDB, storeName: 'fs-cache' }),
 		},
 	},
