@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import { configure, CopyOnWrite, Fetch, fs, resolveMountConfig, type IndexData } from '@zenfs/core';
 import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
+/// <reference types="node" />
 
 await configure({
 	mounts: {

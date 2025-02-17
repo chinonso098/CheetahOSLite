@@ -1,6 +1,7 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
+		"types": ["filesystem", "jest", "node"],
 		"paths": {
 			"path": ["./node_modules/path-browserify"],
 			"url": ["./node_modules/url"]
