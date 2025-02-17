@@ -9,16 +9,16 @@ import { Buffer } from 'buffer';
 import ini from 'ini';
 import { Subject } from 'rxjs';
 
-import { configure, Fetch, fs, Overlay, type IndexData } from '@zenfs/core';
+import { configure, CopyOnWrite, Fetch, fs, resolveMountConfig, type IndexData } from '@zenfs/core';
 import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
 
-await configure<typeof Overlay>({
+await configure({
 	mounts: {
 		'/': {
-			backend: Overlay,
-			readable: { backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'osdrive' },
-			writable: { backend: IndexedDB, storeName: 'fs-cache' },
+			backend: CopyOnWrite,
+			readable: await resolveMountConfig({ backend: Fetch, index: OSFileSystemIndex as IndexData, baseUrl: 'osdrive' }),
+			writable: await resolveMountConfig({ backend: IndexedDB, storeName: 'fs-cache' }),
 		},
 	},
 });
