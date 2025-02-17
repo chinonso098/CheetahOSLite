@@ -13,7 +13,7 @@ import { TriggerProcessService } from 'src/app/shared/system-service/trigger.pro
 import { ScriptService } from 'src/app/shared/system-service/script.services';
 import { MenuService } from 'src/app/shared/system-service/menu.services';
 import { NestedMenu, NestedMenuItem } from 'src/app/shared/system-component/menu/menu.item';
-import { FileService } from 'src/app/shared/system-service/file.service';
+import * as files from 'src/app/shared/system-service/file.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
@@ -41,7 +41,6 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
   private _processIdService:ProcessIDService;
   private _runningProcessService:RunningProcessService;
   private _fileManagerServices:FileManagerService;
-  private _fileService:FileService;
   private _triggerProcessService:TriggerProcessService;
   private _scriptService: ScriptService;
   private _menuService: MenuService;
@@ -128,14 +127,13 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
 
 
   constructor( processIdService:ProcessIDService,runningProcessService:RunningProcessService,fileManagerServices:FileManagerService,
-              triggerProcessService:TriggerProcessService, scriptService: ScriptService, menuService: MenuService, fileService:FileService) { 
+              triggerProcessService:TriggerProcessService, scriptService: ScriptService, menuService: MenuService) { 
     this._processIdService = processIdService;
     this._runningProcessService = runningProcessService;
     this._fileManagerServices = fileManagerServices;
     this._triggerProcessService = triggerProcessService;
     this._scriptService = scriptService;
     this._menuService = menuService;
-    this._fileService = fileService;
 
     this._showTaskBarMenuSub = this._menuService.showTaskBarMenu.subscribe((p) => { this.onShowTaskBarContextMenu(p)});
     this._showTaskBarPreviewWindowSub = this._runningProcessService.showPreviewWindowNotify.subscribe((p) => { this.showTaskBarPreviewWindow(p)});
@@ -369,7 +367,7 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit{
     console.log(`action: ${action}`);
 
     if(action === 'copy'){
-      const result = await this._fileService.copyHandler(cntntPath,this.directory);
+      const result = await files.copyHandler(cntntPath,this.directory);
       if(result){
         this.refresh();
       }

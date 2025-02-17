@@ -1,5 +1,5 @@
 import { FileInfo } from "src/app/system-files/fileinfo";
-import { FileService } from "src/app/shared/system-service/file.service";
+import * as files from "src/app/shared/system-service/file.service";
 import { FileEntry } from 'src/app/system-files/fileentry';
 
 export interface OctalRepresentation {
@@ -9,7 +9,6 @@ export interface OctalRepresentation {
 }
 
 export class TerminalCommands{
-    private _fileService:FileService;
     private _directoryFilesEntries!:FileEntry[];
     
     private  permissionChart!:Map<number, OctalRepresentation>;
@@ -17,7 +16,6 @@ export class TerminalCommands{
     private currentDirectoryPath = '/';
 
     constructor() { 
-        this._fileService = FileService.instace;
         this.permissionChart = new Map<number, OctalRepresentation>();
         this.genPermissionsRepresentation();
     }
@@ -121,15 +119,15 @@ ${(file.getIsFile)? '-':'d'}${this.addspaces(strPermission,10)} ${this.addspaces
     async cp(sourceArg:string, destinationArg:string):Promise<string>{
         const folderQueue:string[] = [];
 
-        const isDirectory = await this._fileService.checkIfDirectory(sourceArg);
+        const isDirectory = await files.checkIfDirectory(sourceArg);
         if(isDirectory){
             folderQueue.push(sourceArg);
-                const result = await this._fileService.copyHandler(sourceArg, destinationArg);
+                const result = await files.copyHandler(sourceArg, destinationArg);
                 if(result){
                     this.sendDirectoryUpdateNotification(destinationArg);
             }
         }else{
-            const result = await this._fileService.copyHandler(sourceArg, destinationArg);
+            const result = await files.copyHandler(sourceArg, destinationArg);
             if(result){
                 this.sendDirectoryUpdateNotification(destinationArg);
             }
@@ -140,22 +138,22 @@ ${(file.getIsFile)? '-':'d'}${this.addspaces(strPermission,10)} ${this.addspaces
     private sendDirectoryUpdateNotification(arg0:string):void{
         console.log(`arg0: ${arg0}`);
         if(arg0.includes('/Desktop')){
-            this._fileService.addEventOriginator('filemanager');
+            files.addEventOriginator('filemanager');
         }else{
-            this._fileService.addEventOriginator('fileexplorer');
+            files.addEventOriginator('fileexplorer');
         }
-        this._fileService.dirFilesUpdateNotify.next();
+        files.dirFilesUpdateNotify.next();
     }
 
     private async loadFilesInfoAsync(directory:string):Promise<void>{
         this.files = [];
-        this._fileService.resetDirectoryFiles();
-        const directoryEntries  = await this._fileService.getEntriesFromDirectoryAsync(directory);
-        this._directoryFilesEntries = this._fileService.getFileEntriesFromDirectory(directoryEntries,directory);
+        files.resetDirectoryFiles();
+        const directoryEntries  = await files.getEntriesFromDirectoryAsync(directory);
+        this._directoryFilesEntries = files.getFileEntriesFromDirectory(directoryEntries,directory);
     
         for(let i = 0; i < directoryEntries.length; i++){
           const fileEntry = this._directoryFilesEntries[i];
-          const fileInfo = await this._fileService.getFileInfoAsync(fileEntry.getPath);
+          const fileInfo = await files.getFileInfoAsync(fileEntry.getPath);
     
           this.files.push(fileInfo)
         }

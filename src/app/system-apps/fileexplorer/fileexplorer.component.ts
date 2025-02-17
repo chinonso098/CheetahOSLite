@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, OnDestroy, ViewChild, ElementRef, ViewEncapsulation} from '@angular/core';
-import { FileService } from 'src/app/shared/system-service/file.service';
+import * as files from 'src/app/shared/system-service/file.service';
 import { ProcessIDService } from 'src/app/shared/system-service/process.id.service';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
 import { ComponentType } from 'src/app/system-files/component.types';
@@ -38,7 +38,6 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
  
   private _processIdService:ProcessIDService;
   private _runningProcessService:RunningProcessService;
-  private _fileService:FileService;
   private _directoryFilesEntires!:FileEntry[];
   private _triggerProcessService:TriggerProcessService;
   private _stateManagmentService: StateManagmentService;
@@ -181,12 +180,11 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
 
 
-  constructor(processIdService:ProcessIDService, runningProcessService:RunningProcessService, fileInfoService:FileService, triggerProcessService:TriggerProcessService, 
+  constructor(processIdService:ProcessIDService, runningProcessService:RunningProcessService, triggerProcessService:TriggerProcessService, 
               fileManagerService:FileManagerService, formBuilder: FormBuilder, stateManagmentService:StateManagmentService, sessionManagmentService:SessionManagmentService,        
               menuService:MenuService ) { 
     this._processIdService = processIdService;
     this._runningProcessService = runningProcessService;
-    this._fileService = fileInfoService;
     this._triggerProcessService = triggerProcessService;
     this._stateManagmentService = stateManagmentService;
     this._sessionManagmentService = sessionManagmentService;
@@ -197,10 +195,10 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
     this._runningProcessService.addProcess(this.getComponentDetail());
     this.retrievePastSessionData();
 
-    this._dirFilesUpdatedSub = this._fileService.dirFilesUpdateNotify.subscribe(() =>{
-      if(this._fileService.getEventOrginator() === this.name){
+    this._dirFilesUpdatedSub = files.dirFilesUpdateNotify.subscribe(() =>{
+      if(files.getEventOrginator() === this.name){
         this.loadFilesInfoAsync();
-        this._fileService.removeEventOriginator();
+        files.removeEventOriginator();
       }
     });
 
@@ -657,13 +655,13 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
   private async loadFilesInfoAsync():Promise<void>{
     this.files = [];
-    this._fileService.resetDirectoryFiles();
-    const directoryEntries  = await this._fileService.getEntriesFromDirectoryAsync(this.directory);
-    this._directoryFilesEntires = this._fileService.getFileEntriesFromDirectory(directoryEntries,this.directory);
+    files.resetDirectoryFiles();
+    const directoryEntries  = await files.getEntriesFromDirectoryAsync(this.directory);
+    this._directoryFilesEntires = files.getFileEntriesFromDirectory(directoryEntries,this.directory);
 
     for(let i = 0; i < directoryEntries.length; i++){
       const fileEntry = this._directoryFilesEntires[i];
-      const fileInfo = await this._fileService.getFileInfoAsync(fileEntry.getPath);
+      const fileInfo = await files.getFileInfoAsync(fileEntry.getPath);
 
       this.files.push(fileInfo)
     }
