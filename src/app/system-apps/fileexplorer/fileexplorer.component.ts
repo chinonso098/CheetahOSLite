@@ -18,7 +18,7 @@ import { AppState, BaseState } from 'src/app/system-files/state/state.interface'
 import { StateType } from 'src/app/system-files/state/state.type';
 import { SessionManagmentService } from 'src/app/shared/system-service/session.management.service';
 import { NestedMenu, NestedMenuItem } from 'src/app/shared/system-component/menu/menu.item';
-import { Constants } from 'src/app/system-files/constants';
+import { IMAGE_FILE_EXTENSIONS } from 'src/app/system-files/constants';
 import * as htmlToImage from 'html-to-image';
 import { TaskBarPreviewImage } from '../taskbarpreview/taskbar.preview';
 import { MenuService } from 'src/app/shared/system-service/menu.services';
@@ -46,7 +46,6 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
   private _menuService:MenuService;
   private _formBuilder;
   private _appState!:AppState;
-  private _consts:Constants = new Constants();
 
   private _viewByNotifySub!:Subscription;
   private _sortByNotifySub!:Subscription;
@@ -656,13 +655,12 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
 
   private async loadFilesInfoAsync():Promise<void>{
     this.files = [];
-    files.resetDirectoryFiles();
     const directoryEntries  = await files.getEntriesFromDirectoryAsync(this.directory);
     this._directoryFilesEntires = files.getFileEntriesFromDirectory(directoryEntries,this.directory);
 
     for(let i = 0; i < directoryEntries.length; i++){
       const fileEntry = this._directoryFilesEntires[i];
-      const fileInfo = await files.getFileInfoAsync(fileEntry.getPath);
+      const fileInfo = await files.getFileInfoAsync(fileEntry.path);
 
       this.files.push(fileInfo)
     }
@@ -1106,7 +1104,7 @@ export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewIn
     //reset
     this.fileInfoTipData = [];
 
-    if(this._consts.IMAGE_FILE_EXTENSIONS.includes(file.getFileType)){
+    if(IMAGE_FILE_EXTENSIONS.includes(file.getFileType)){
       const img = new Image();
       img.src = file.getIconPath;
       const width = img?.naturalWidth;

@@ -147,13 +147,12 @@ ${(file.getIsFile)? '-':'d'}${this.addspaces(strPermission,10)} ${this.addspaces
 
     private async loadFilesInfoAsync(directory:string):Promise<void>{
         this.files = [];
-        files.resetDirectoryFiles();
-        const directoryEntries  = await files.getEntriesFromDirectoryAsync(directory);
+        const directoryEntries = await files.getEntriesFromDirectoryAsync(directory);
         this._directoryFilesEntries = files.getFileEntriesFromDirectory(directoryEntries,directory);
     
         for(let i = 0; i < directoryEntries.length; i++){
           const fileEntry = this._directoryFilesEntries[i];
-          const fileInfo = await files.getFileInfoAsync(fileEntry.getPath);
+          const fileInfo = await files.getFileInfoAsync(fileEntry.path);
     
           this.files.push(fileInfo)
         }

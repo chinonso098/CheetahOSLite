@@ -153,13 +153,12 @@ export class FileManagerComponent implements BaseComponent, OnInit, AfterViewIni
 
   private async loadFilesInfoAsync():Promise<void>{
     this.files = [];
-    files.resetDirectoryFiles();
     const directoryEntries  = await files.getEntriesFromDirectoryAsync(this.directory);
     this._directoryFilesEntries = files.getFileEntriesFromDirectory(directoryEntries,this.directory);
 
     for(let i = 0; i < directoryEntries.length; i++){
       const fileEntry = this._directoryFilesEntries[i];
-      const fileInfo = await files.getFileInfoAsync(fileEntry.getPath);
+      const fileInfo = await files.getFileInfoAsync(fileEntry.path);
       this.files.push(fileInfo)
     }
   }
