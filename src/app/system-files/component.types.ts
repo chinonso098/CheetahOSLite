@@ -1,4 +1,4 @@
-export enum ComponentType{
-    System = "System",
-    User = "User"
+export enum ComponentType {
+	System = 'System',
+	User = 'User',
 }

@@ -21,7 +21,16 @@
 		"target": "ES2022",
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
-		"lib": ["ES2024", "DOM", "DOM.Iterable", "ESNext.Promise", "ESNext.Decorators", "Decorators", "ESNext.Disposable", "ESNext.AsyncIterable"],
+		"lib": [
+			"ES2024",
+			"DOM",
+			"DOM.Iterable",
+			"ESNext.Promise",
+			"ESNext.Decorators",
+			"Decorators",
+			"ESNext.Disposable",
+			"ESNext.AsyncIterable"
+		],
 		"resolveJsonModule": true,
 		"esModuleInterop": true
 	},

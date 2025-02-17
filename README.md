@@ -7,6 +7,7 @@ Building a Dektop environment in the web browser
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.0.
 
 ## Development server
+
 Run `npm install` to install all the needed pacakges
 
 Run `npm run build` to generate the filesystem(index.json). index.json is present, so this step can be skipped.

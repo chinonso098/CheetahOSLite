@@ -1,29 +1,29 @@
-.main-desktop{
-    height: 100vh;
-    width: 100vw;
-    /* overflow: hidden; overflow no longer needed since position is now fixed */  
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background-color: #208c71;
+.main-desktop {
+	height: 100vh;
+	width: 100vw;
+	/* overflow: hidden; overflow no longer needed since position is now fixed */
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background-color: #208c71;
 }
 
-.dsktp-screen-preview-container{
-    z-index: 2;
-    position: absolute;
-    width: 200px;
-    height: 120px;
-    right: 2px;
-    bottom: 41px;
+.dsktp-screen-preview-container {
+	z-index: 2;
+	position: absolute;
+	width: 200px;
+	height: 120px;
+	right: 2px;
+	bottom: 41px;
 }
 
-.dsktp-screen-preview-container img{
-    height: 100%;
-    width: 100%;
+.dsktp-screen-preview-container img {
+	height: 100%;
+	width: 100%;
 }
 
-.dsktp-screen-preview-container img{
-    object-fit: contain;
+.dsktp-screen-preview-container img {
+	object-fit: contain;
 }

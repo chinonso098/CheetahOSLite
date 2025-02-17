@@ -1,4 +1,10 @@
-import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
+import {
+	Component,
+	ElementRef,
+	ViewChild,
+	OnDestroy,
+	AfterViewInit,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ProcessIDService } from 'src/app/shared/system-service/process.id.service';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
@@ -9,86 +15,91 @@ import * as htmlToImage from 'html-to-image';
 import { TaskBarPreviewImage } from 'src/app/system-apps/taskbarpreview/taskbar.preview';
 
 @Component({
-  selector:'cos-title',
-  templateUrl: './title.component.html',
-  styleUrls: ["./title.component.css"],
-  standalone: false,
+	selector: 'cos-title',
+	templateUrl: './title.component.html',
+	styleUrls: ['./title.component.css'],
+	standalone: false,
 })
+export class TitleComponent implements BaseComponent, OnDestroy, AfterViewInit {
+	@ViewChild('titleContent', { static: true }) titleContent!: ElementRef;
 
-export class TitleComponent implements BaseComponent, OnDestroy, AfterViewInit{
+	private _processIdService: ProcessIDService;
+	private _runningProcessService: RunningProcessService;
+	private _maximizeWindowSub!: Subscription;
+	SECONDS_DELAY = 250;
 
-  @ViewChild('titleContent', {static: true}) titleContent!: ElementRef;
+	hasWindow = true;
+	icon = 'osdrive/Pictures/favicon_nice.png';
+	name = 'hello';
+	processId = 0;
+	type = ComponentType.User;
+	displayName = 'Hello';
 
-  private _processIdService:ProcessIDService;
-  private _runningProcessService:RunningProcessService;
-  private _maximizeWindowSub!: Subscription;
-  SECONDS_DELAY = 250;
+	constructor(
+		processIdService: ProcessIDService,
+		runningProcessService: RunningProcessService
+	) {
+		this._processIdService = processIdService;
+		this._runningProcessService = runningProcessService;
 
-  hasWindow = true;
-  icon = 'osdrive/Pictures/favicon_nice.png';
-  name = 'hello';
-  processId = 0;
-  type = ComponentType.User;
-  displayName = 'Hello';
+		this.processId = this._processIdService.getNewProcessId();
+		this._runningProcessService.addProcess(this.getComponentDetail());
 
-  constructor( processIdService:ProcessIDService,runningProcessService:RunningProcessService) { 
-    this._processIdService = processIdService;
-    this._runningProcessService = runningProcessService;
+		this._maximizeWindowSub =
+			this._runningProcessService.maximizeWindowNotify.subscribe(() => {
+				this.maximizeWindow();
+			});
+	}
 
-    this.processId = this._processIdService.getNewProcessId()
-    this._runningProcessService.addProcess(this.getComponentDetail()); 
+	ngAfterViewInit(): void {
+		this.setTitleWindowToFocus(this.processId);
 
-    this._maximizeWindowSub = this._runningProcessService.maximizeWindowNotify.subscribe(() =>{this.maximizeWindow()});
-  }
+		setTimeout(() => {
+			this.captureComponentImg();
+		}, this.SECONDS_DELAY);
+	}
 
+	ngOnDestroy(): void {
+		this._maximizeWindowSub?.unsubscribe();
+	}
 
-  ngAfterViewInit(): void {
-    this.setTitleWindowToFocus(this.processId); 
+	captureComponentImg(): void {
+		htmlToImage.toPng(this.titleContent.nativeElement).then((htmlImg) => {
+			//console.log('img data:',htmlImg);
 
-    setTimeout(()=>{
-      this.captureComponentImg();
-    },this.SECONDS_DELAY) 
-  }
+			const cmpntImg: TaskBarPreviewImage = {
+				pid: this.processId,
+				imageData: htmlImg,
+			};
+			this._runningProcessService.addProcessImage(this.name, cmpntImg);
+		});
+	}
 
-  ngOnDestroy():void{
-    this._maximizeWindowSub?.unsubscribe();
-  }
+	maximizeWindow(): void {
+		const uid = `${this.name}-${this.processId}`;
+		const evtOriginator = this._runningProcessService.getEventOrginator();
 
-  captureComponentImg():void{
-    htmlToImage.toPng(this.titleContent.nativeElement).then(htmlImg =>{
-      //console.log('img data:',htmlImg);
+		if (uid === evtOriginator) {
+			this._runningProcessService.removeEventOriginator();
+			const mainWindow = document.getElementById('vanta');
+			//window title and button bar, and windows taskbar height
+			const pixelTosubtract = 30 + 40;
+			this.titleContent.nativeElement.style.height = `${(mainWindow?.offsetHeight || 0) - pixelTosubtract}px`;
+			this.titleContent.nativeElement.style.width = `${mainWindow?.offsetWidth}px`;
+		}
+	}
 
-      const cmpntImg:TaskBarPreviewImage = {
-        pid: this.processId,
-        imageData: htmlImg
-      }
-      this._runningProcessService.addProcessImage(this.name, cmpntImg);
-    })
-  }
+	setTitleWindowToFocus(pid: number): void {
+		this._runningProcessService.focusOnCurrentProcessNotify.next(pid);
+	}
 
-  maximizeWindow():void{
-
-    const uid = `${this.name}-${this.processId}`;
-    const evtOriginator = this._runningProcessService.getEventOrginator();
-
-    if(uid === evtOriginator){
-
-      this._runningProcessService.removeEventOriginator();
-      const mainWindow = document.getElementById('vanta');
-      //window title and button bar, and windows taskbar height
-      const pixelTosubtract = 30 + 40;
-      this.titleContent.nativeElement.style.height = `${(mainWindow?.offsetHeight || 0) - pixelTosubtract}px`;
-      this.titleContent.nativeElement.style.width = `${mainWindow?.offsetWidth}px`;
-
-    }
-  }
-
-  setTitleWindowToFocus(pid:number):void{
-    this._runningProcessService.focusOnCurrentProcessNotify.next(pid);
-  }
-
-  private getComponentDetail():Process{
-    return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type)
-  }
-
+	private getComponentDetail(): Process {
+		return new Process(
+			this.processId,
+			this.name,
+			this.icon,
+			this.hasWindow,
+			this.type
+		);
+	}
 }

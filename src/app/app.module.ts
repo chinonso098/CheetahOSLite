@@ -20,7 +20,7 @@ import { FileManagerComponent } from './system-apps/filemanager/filemanager.comp
 import { TerminalComponent } from './system-apps/terminal/terminal.component';
 import { MenuComponent } from './shared/system-component/menu/menu.component';
 import { DialogComponent } from './shared/system-component/dialog/dialog.component';
-import { PropertiesComponent } from './shared/system-component/properties/properties.component'; 
+import { PropertiesComponent } from './shared/system-component/properties/properties.component';
 
 import { SafeUrlPipe } from './shared/system-pipes/safe.resource.url.pipe';
 import { TruncatePipe } from './shared/system-pipes/string.shorten.pipe';
@@ -29,43 +29,40 @@ import { HighlightDirective } from './system-apps/window/window.btn.highlight.di
 import { TaskBarEntryHighlightDirective } from './system-apps/taskbarentries/taskbar.entry.highlight.directives';
 import { KeyPressCaptureDirective } from './system-apps/terminal/key.press.capture.directive';
 
-
 @NgModule({
-  declarations: [
-    TitleComponent,
-    AppComponent,
-    DesktopComponent,
-    TaskbarComponent,
-    ClockComponent,
-    StartButtonComponent,
-    TaskBarPreviewComponent,
-    TaskBarEntriesComponent,
-    TaskBarEntryComponent,
-    FileExplorerComponent,
-    WindowComponent,
-    FileManagerComponent,
-    TerminalComponent,
-    MenuComponent,
-    PropertiesComponent,
-    DialogComponent,
- 
+	declarations: [
+		TitleComponent,
+		AppComponent,
+		DesktopComponent,
+		TaskbarComponent,
+		ClockComponent,
+		StartButtonComponent,
+		TaskBarPreviewComponent,
+		TaskBarEntriesComponent,
+		TaskBarEntryComponent,
+		FileExplorerComponent,
+		WindowComponent,
+		FileManagerComponent,
+		TerminalComponent,
+		MenuComponent,
+		PropertiesComponent,
+		DialogComponent,
 
-    HighlightDirective,
-    TaskBarEntryHighlightDirective,
-    KeyPressCaptureDirective,
+		HighlightDirective,
+		TaskBarEntryHighlightDirective,
+		KeyPressCaptureDirective,
 
-    SafeUrlPipe,
-    TruncatePipe
-    
-  ],
-  imports: [
-    BrowserModule,
-    AngularDraggableModule,
-    BrowserAnimationsModule,
-    ReactiveFormsModule,
-    FormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent],
+		SafeUrlPipe,
+		TruncatePipe,
+	],
+	imports: [
+		BrowserModule,
+		AngularDraggableModule,
+		BrowserAnimationsModule,
+		ReactiveFormsModule,
+		FormsModule,
+	],
+	providers: [],
+	bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -103,12 +103,7 @@ export async function copyHandler(
 export async function getExtraFileMetaDataAsync(path: string) {
 	await fsReady;
 	const stats = await fs.promises.stat(path);
-	return new FileMetaData(
-		stats.ctime,
-		stats.mtime,
-		stats.size,
-		stats.mode
-	);
+	return new FileMetaData(stats.ctime, stats.mtime, stats.size, stats.mode);
 }
 
 export async function getEntriesFromDirectoryAsync(

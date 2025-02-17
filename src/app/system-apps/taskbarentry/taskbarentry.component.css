@@ -1,15 +1,15 @@
-li{
-    display: flex;
-    height: 100%;
-    min-width: 0;
-    margin: 0 4px;
+li {
+	display: flex;
+	height: 100%;
+	min-width: 0;
+	margin: 0 4px;
 }
 
-figure{
-    align-items: center;
-    display: flex;
-    min-width: 0px;
-    padding: 4px;
+figure {
+	align-items: center;
+	display: flex;
+	min-width: 0px;
+	padding: 4px;
 }
 
 /* figcaption{
@@ -21,10 +21,10 @@ figure{
     white-space: nowrap;
 } */
 
-img{
-    height: 25px;
-    width: 25px;
-    image-rendering:optimizeQuality;
-    position: relative;
-    top: 1px
+img {
+	height: 25px;
+	width: 25px;
+	image-rendering: optimizeQuality;
+	position: relative;
+	top: 1px;
 }

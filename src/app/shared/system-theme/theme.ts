@@ -1,3 +1,1 @@
-export class OSTheme{
-    
-}
+export class OSTheme {}

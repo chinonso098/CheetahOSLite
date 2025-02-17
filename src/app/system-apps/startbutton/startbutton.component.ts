@@ -5,35 +5,44 @@ import { ComponentType } from 'src/app/system-files/component.types';
 import { Process } from 'src/app/system-files/process';
 
 @Component({
-  selector: 'cos-startbutton',
-  templateUrl: './startbutton.component.html',
-  styleUrls: ['./startbutton.component.css'],
-  standalone: false,
+	selector: 'cos-startbutton',
+	templateUrl: './startbutton.component.html',
+	styleUrls: ['./startbutton.component.css'],
+	standalone: false,
 })
 export class StartButtonComponent implements OnInit {
-  private _processIdService:ProcessIDService;
-  private _runningProcessService:RunningProcessService;
+	private _processIdService: ProcessIDService;
+	private _runningProcessService: RunningProcessService;
 
-  hasWindow = false;
-  hover = false;
-  icon = 'osdrive/icons/generic-program.ico';
-  name = 'startbutton';
-  processId = 0;
-  type = ComponentType.System
-  displayName = '';
+	hasWindow = false;
+	hover = false;
+	icon = 'osdrive/icons/generic-program.ico';
+	name = 'startbutton';
+	processId = 0;
+	type = ComponentType.System;
+	displayName = '';
 
-  constructor( processIdService:ProcessIDService,runningProcessService:RunningProcessService) { 
-    this._processIdService = processIdService;
-    this._runningProcessService = runningProcessService;
-    this.processId = this._processIdService.getNewProcessId()
-    this._runningProcessService.addProcess(this.getComponentDetail());
-  }
+	constructor(
+		processIdService: ProcessIDService,
+		runningProcessService: RunningProcessService
+	) {
+		this._processIdService = processIdService;
+		this._runningProcessService = runningProcessService;
+		this.processId = this._processIdService.getNewProcessId();
+		this._runningProcessService.addProcess(this.getComponentDetail());
+	}
 
-  ngOnInit(): void {
-    1 
-  }
-  
-  private getComponentDetail():Process{
-    return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type)
-  }
+	ngOnInit(): void {
+		1;
+	}
+
+	private getComponentDetail(): Process {
+		return new Process(
+			this.processId,
+			this.name,
+			this.icon,
+			this.hasWindow,
+			this.type
+		);
+	}
 }

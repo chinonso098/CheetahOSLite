@@ -1,22 +1,22 @@
-ol{
-    height: 100%;
-    left: 60px;
-    position: absolute;
-    right:80px;
-    display: flex;
-    column-gap: 6px; /*reduce column gap to like 4 px*/
-    margin: 0 1px;
-    transition: all 0.075s;
+ol {
+	height: 100%;
+	left: 60px;
+	position: absolute;
+	right: 80px;
+	display: flex;
+	column-gap: 6px; /*reduce column gap to like 4 px*/
+	margin: 0 1px;
+	transition: all 0.075s;
 }
 
-li{
-    height: 100%;
-    min-width: 0px;
-    border-bottom: 2px solid hsl(207deg 100%  72% / 90%);
+li {
+	height: 100%;
+	min-width: 0px;
+	border-bottom: 2px solid hsl(207deg 100% 72% / 90%);
 }
 
-.li-inactive{
-    height: 100%;
-    min-width: 0px;
-    border-bottom: 2px solid transparent;
+.li-inactive {
+	height: 100%;
+	min-width: 0px;
+	border-bottom: 2px solid transparent;
 }
