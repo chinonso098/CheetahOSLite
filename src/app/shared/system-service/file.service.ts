@@ -1,4 +1,4 @@
-import { basename, extname, resolve } from 'path';
+import { basename, extname, resolve } from '@zenfs/core/vfs/path.js';
 import { Constants } from 'src/app/system-files/constants';
 import { FileMetaData } from 'src/app/system-files/file.metadata';
 import { FileEntry } from 'src/app/system-files/fileentry';

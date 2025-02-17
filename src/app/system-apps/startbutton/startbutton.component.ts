@@ -7,7 +7,8 @@ import { Process } from 'src/app/system-files/process';
 @Component({
   selector: 'cos-startbutton',
   templateUrl: './startbutton.component.html',
-  styleUrls: ['./startbutton.component.css']
+  styleUrls: ['./startbutton.component.css'],
+  standalone: false,
 })
 export class StartButtonComponent implements OnInit {
   private _processIdService:ProcessIDService;

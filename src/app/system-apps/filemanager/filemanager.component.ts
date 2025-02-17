@@ -17,7 +17,8 @@ import { MenuService } from 'src/app/shared/system-service/menu.services';
 @Component({
   selector: 'cos-filemanager',
   templateUrl: './filemanager.component.html',
-  styleUrls: ['./filemanager.component.css']
+  styleUrls: ['./filemanager.component.css'],
+  standalone: false,
 })
 export class FileManagerComponent implements BaseComponent, OnInit, AfterViewInit, OnDestroy {
   @ViewChild('myBounds', {static: true}) myBounds!: ElementRef;

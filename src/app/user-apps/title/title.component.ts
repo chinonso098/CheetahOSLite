@@ -11,7 +11,8 @@ import { TaskBarPreviewImage } from 'src/app/system-apps/taskbarpreview/taskbar.
 @Component({
   selector:'cos-title',
   templateUrl: './title.component.html',
-  styleUrls: ["./title.component.css"]
+  styleUrls: ["./title.component.css"],
+  standalone: false,
 })
 
 export class TitleComponent implements BaseComponent, OnDestroy, AfterViewInit{

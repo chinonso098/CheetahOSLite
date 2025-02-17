@@ -6,7 +6,8 @@ import { NotificationType } from 'src/app/system-files/notification.type';
 @Component({
   selector: 'cos-dialog',
   templateUrl: './dialog.component.html',
-  styleUrls: ['./dialog.component.css']
+  styleUrls: ['./dialog.component.css'],
+  standalone: false,
 })
 
 

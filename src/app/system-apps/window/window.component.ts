@@ -16,7 +16,8 @@ import { TaskBarPreviewImage } from 'src/app/system-apps/taskbarpreview/taskbar.
    selector: 'cos-window',
    templateUrl: './window.component.html',
    animations: [openCloseAnimation,hideShowAnimation,minimizeMaximizeAnimation],
-   styleUrls: ['./window.component.css']
+   styleUrls: ['./window.component.css'],
+   standalone: false,
  })
  export class WindowComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
    @ViewChild('divWindow') divWindow!: ElementRef;

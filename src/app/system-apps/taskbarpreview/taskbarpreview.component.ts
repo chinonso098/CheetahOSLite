@@ -6,6 +6,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
   selector: 'cos-taskbarpreview',
   templateUrl: './taskbarpreview.component.html',
   styleUrl: './taskbarpreview.component.css',
+  standalone: false,
   animations: [
     trigger('fadeAnimation', [
       state('in', style({ opacity: 1 })),

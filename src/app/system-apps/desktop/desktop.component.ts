@@ -20,6 +20,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
   selector: 'cos-desktop',
   templateUrl: './desktop.component.html',
   styleUrls: ['./desktop.component.css'],
+  standalone: false,
   animations: [
     trigger('slideStatusAnimation', [
       state('slideOut', style({ right: '-200px' })),

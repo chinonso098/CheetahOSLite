@@ -24,6 +24,7 @@ import { DialogComponent } from './shared/system-component/dialog/dialog.compone
   selector: 'cos-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  standalone: false,
 })
 
 /**

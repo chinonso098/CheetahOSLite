@@ -8,7 +8,8 @@ import { Process } from 'src/app/system-files/process';
 @Component({
   selector: 'cos-taskbar',
   templateUrl: './taskbar.component.html',
-  styleUrls: ['./taskbar.component.css']
+  styleUrls: ['./taskbar.component.css'],
+  standalone: false,
 })
 export class TaskbarComponent {
 

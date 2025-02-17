@@ -11,7 +11,8 @@ import { Process } from 'src/app/system-files/process';
 @Component({
   selector: 'cos-taskbarentries',
   templateUrl: './taskbarentries.component.html',
-  styleUrls: ['./taskbarentries.component.css']
+  styleUrls: ['./taskbarentries.component.css'],
+  standalone: false,
 })
 export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 

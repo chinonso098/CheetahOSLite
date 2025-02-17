@@ -9,7 +9,8 @@ import { Process } from 'src/app/system-files/process';
 @Component({
   selector: 'cos-clock',
   templateUrl: './clock.component.html',
-  styleUrls: ['./clock.component.css']
+  styleUrls: ['./clock.component.css'],
+  standalone: false,
 })
 export class ClockComponent implements AfterViewInit,OnDestroy {
 

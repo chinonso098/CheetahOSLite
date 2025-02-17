@@ -66,6 +66,6 @@ import { KeyPressCaptureDirective } from './system-apps/terminal/key.press.captu
     FormsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -13,7 +13,7 @@ import { StateManagmentService } from 'src/app/shared/system-service/state.manag
 import { FileManagerService } from 'src/app/shared/system-service/file.manager.services';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ViewOptions } from './fileexplorer.enums';
-import {basename} from 'path';
+import {basename} from '@zenfs/core/vfs/path.js';
 import { AppState, BaseState } from 'src/app/system-files/state/state.interface';
 import { StateType } from 'src/app/system-files/state/state.type';
 import { SessionManagmentService } from 'src/app/shared/system-service/session.management.service';
@@ -29,6 +29,7 @@ import { SortBys } from '../desktop/desktop.enums';
   templateUrl: './fileexplorer.component.html',
   styleUrls: ['./fileexplorer.component.css'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 
 export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewInit, OnDestroy {
