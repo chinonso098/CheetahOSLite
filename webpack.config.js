@@ -1,5 +1,3 @@
-module.exports = {
-	experiments: {
-		topLevelAwait: true,
-	},
+export const experiments = {
+	topLevelAwait: true,
 };
