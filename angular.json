@@ -15,11 +15,8 @@
 			"prefix": "cos",
 			"architect": {
 				"build": {
-					"builder": "@angular-builders/custom-webpack:browser",
+					"builder": "@angular-devkit/build-angular:browser",
 					"options": {
-						"customWebpackConfig": {
-							"path": "./webpack.config.js"
-						},
 						"allowedCommonJsDependencies": [
 							"buffer",
 							"ini",
@@ -33,12 +30,16 @@
 						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.app.json",
 						"inlineStyleLanguage": "css",
-						"assets": ["src/osdrive"],
+						"assets": [
+							"src/osdrive"
+						],
 						"styles": [
 							"src/styles.css",
 							"node_modules/angular2-draggable/css/resizable.min.css"
 						],
-						"scripts": ["./src/scripts/backgrounds/three.min.js"]
+						"scripts": [
+							"./src/scripts/backgrounds/three.min.js"
+						]
 					},
 					"configurations": {
 						"production": {
@@ -74,7 +75,7 @@
 					"defaultConfiguration": "production"
 				},
 				"serve": {
-					"builder": "@angular-builders/custom-webpack:dev-server",
+					"builder": "@angular-devkit/build-angular:dev-server",
 					"configurations": {
 						"production": {
 							"buildTarget": "CheetahOs:build:production"
@@ -92,29 +93,39 @@
 					}
 				},
 				"test": {
-					"builder": "@angular-builders/custom-webpack:karma",
+					"builder": "@angular-devkit/build-angular:karma",
 					"options": {
 						"main": "src/test.ts",
 						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.spec.json",
 						"karmaConfig": "karma.conf.js",
 						"inlineStyleLanguage": "css",
-						"assets": ["src/favicon.ico", "src/assets"],
-						"styles": ["src/styles.css"],
+						"assets": [
+							"src/favicon.ico",
+							"src/assets"
+						],
+						"styles": [
+							"src/styles.css"
+						],
 						"scripts": []
 					}
 				},
 				"lint": {
 					"builder": "@angular-eslint/builder:lint",
 					"options": {
-						"lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+						"lintFilePatterns": [
+							"src/**/*.ts",
+							"src/**/*.html"
+						]
 					}
 				}
 			}
 		}
 	},
 	"cli": {
-		"schematicCollections": ["@angular-eslint/schematics"],
+		"schematicCollections": [
+			"@angular-eslint/schematics"
+		],
 		"analytics": false
 	},
 	"schematics": {
