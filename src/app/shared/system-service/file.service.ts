@@ -23,23 +23,22 @@ import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
 /// <reference types="node" />
 
-const configured = (async () =>
-	await configure({
-		mounts: {
-			'/': {
-				backend: CopyOnWrite,
-				readable: await resolveMountConfig({
-					backend: Fetch,
-					index: OSFileSystemIndex as IndexData,
-					baseUrl: 'http://localhost:4200/osdrive',
-				}),
-				writable: await resolveMountConfig({
-					backend: IndexedDB,
-					storeName: 'fs-cache',
-				}),
+const configured = configure({
+	mounts: {
+		'/': {
+			backend: CopyOnWrite,
+			readable: {
+				backend: Fetch,
+				index: OSFileSystemIndex as IndexData,
+				baseUrl: 'http://localhost:4200/osdrive',
+			},
+			writable: {
+				backend: IndexedDB,
+				storeName: 'fs-cache',
 			},
 		},
-	}))();
+	},
+});
 
 function throwWithPath(error: ErrnoError): never {
 	// We want the path in the message, since Angular won't throw the actual error.
