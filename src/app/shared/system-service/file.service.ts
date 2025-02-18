@@ -9,16 +9,8 @@ import { Buffer } from 'buffer';
 import ini from 'ini';
 import { Subject } from 'rxjs';
 
-import {
-	configure,
-	CopyOnWrite,
-	Fetch,
-	default as fs,
-	resolveMountConfig,
-	type ErrnoError,
-	type IndexData,
-} from '@zenfs/core';
-
+import type { ErrnoError, IndexData } from '@zenfs/core';
+import { configure, CopyOnWrite, Fetch, default as fs } from '@zenfs/core';
 import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
 /// <reference types="node" />
