@@ -1,13 +1,13 @@
-button{
-    color: white;
-    font-size: 20px;
-    display: flex;
-    place-content: center;
-    place-items: center;
-    position: absolute;
-    height: 100%;
-    width: 60px;
-    left: 0;
-    background-color: unset;
-    /* bottom: 0; */
+button {
+	color: white;
+	font-size: 20px;
+	display: flex;
+	place-content: center;
+	place-items: center;
+	position: absolute;
+	height: 100%;
+	width: 60px;
+	left: 0;
+	background-color: unset;
+	/* bottom: 0; */
 }

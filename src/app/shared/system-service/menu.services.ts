@@ -1,53 +1,49 @@
-import { Injectable } from "@angular/core";
-import { Subject } from "rxjs";
-import { FileInfo } from "src/app/system-files/fileinfo";
-import { Process } from "src/app/system-files/process";
-
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+import { FileInfo } from 'src/app/system-files/fileinfo';
+import { Process } from 'src/app/system-files/process';
 
 @Injectable({
-    providedIn: 'root'
+	providedIn: 'root',
 })
+export class MenuService {
+	private _isPasteActive = false;
+	private _path = 'NOPATH';
+	private _actions = '';
 
-export class MenuService{
+	pinToTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
+	unPinFromTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
+	// openApplication: Subject<FileInfo> = new Subject<FileInfo>();
+	// closeApplication: Subject<FileInfo[]> = new Subject<FileInfo[]>();
+	openApplicationFromTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
+	closeApplicationFromTaskBar: Subject<Process[]> = new Subject<Process[]>();
+	showTaskBarMenu: Subject<unknown[]> = new Subject<unknown[]>();
+	hideTaskBarMenu: Subject<void> = new Subject<void>();
+	keepTaskBarMenu: Subject<void> = new Subject<void>();
+	hideContextMenus: Subject<void> = new Subject<void>();
+	storeData: Subject<string[]> = new Subject<string[]>();
 
-    private _isPasteActive = false;
-    private _path = 'NOPATH';
-    private _actions = '';
+	setPasteState(isActive: boolean): void {
+		this._isPasteActive = isActive;
+	}
 
-    pinToTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
-    unPinFromTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
-    // openApplication: Subject<FileInfo> = new Subject<FileInfo>();
-    // closeApplication: Subject<FileInfo[]> = new Subject<FileInfo[]>();
-    openApplicationFromTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
-    closeApplicationFromTaskBar: Subject<Process[]> = new Subject<Process[]>();
-    showTaskBarMenu: Subject<unknown[]> = new Subject<unknown[]>();
-    hideTaskBarMenu: Subject<void> = new Subject<void>();
-    keepTaskBarMenu: Subject<void> = new Subject<void>();
-    hideContextMenus: Subject<void> = new Subject<void>();
-    storeData: Subject<string[]> = new Subject<string[]>();
+	getPasteState(): boolean {
+		return this._isPasteActive;
+	}
 
+	setPath(path: string): void {
+		this._path = path;
+	}
 
-    setPasteState(isActive:boolean):void{
-        this._isPasteActive = isActive;
-    }
+	getPath(): string {
+		return this._path;
+	}
 
-    getPasteState():boolean{
-        return this._isPasteActive;
-    }
+	setActions(action: string): void {
+		this._actions = action;
+	}
 
-    setPath(path:string):void{
-        this._path = path;
-    }
-
-    getPath():string{
-        return this._path;
-    }
-
-    setActions(action:string):void{
-        this._actions = action;
-    }
-
-    getActions():string{
-        return this._actions;
-    }
+	getActions(): string {
+		return this._actions;
+	}
 }

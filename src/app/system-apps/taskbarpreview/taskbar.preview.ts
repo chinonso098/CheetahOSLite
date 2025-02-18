@@ -1,4 +1,4 @@
 export interface TaskBarPreviewImage {
-    pid: number;
-    imageData: string;
-  }
+	pid: number;
+	imageData: string;
+}

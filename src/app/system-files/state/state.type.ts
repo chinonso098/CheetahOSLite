@@ -1,4 +1,4 @@
-export enum StateType{
-    App = 0,
-    Window = 1
+export enum StateType {
+	App = 0,
+	Window = 1,
 }

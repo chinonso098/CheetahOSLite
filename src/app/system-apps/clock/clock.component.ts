@@ -7,70 +7,81 @@ import { RunningProcessService } from 'src/app/shared/system-service/running.pro
 import { Process } from 'src/app/system-files/process';
 
 @Component({
-  selector: 'cos-clock',
-  templateUrl: './clock.component.html',
-  styleUrls: ['./clock.component.css']
+	selector: 'cos-clock',
+	templateUrl: './clock.component.html',
+	styleUrls: ['./clock.component.css'],
+	standalone: false,
 })
-export class ClockComponent implements AfterViewInit,OnDestroy {
+export class ClockComponent implements AfterViewInit, OnDestroy {
+	private _processIdService;
+	private _runningProcessService;
+	private _taskBarClock: Clock;
+	private _timerSubscription!: Subscription;
+	private _dateSubscription!: Subscription;
 
-  private _processIdService;
-  private _runningProcessService;
-  private _taskBarClock:Clock;
-  private _timerSubscription!:Subscription;
-  private _dateSubscription!:Subscription;
-  
-  subscribeTime!:string;
-  subscribeDate!:string;
+	subscribeTime!: string;
+	subscribeDate!: string;
 
-  hasWindow = false;
-  hover = false;
-  icon = 'osdrive/icons/generic-program.ico';
-  name = 'clock';
-  processId = 0;
-  type = ComponentType.System
+	hasWindow = false;
+	hover = false;
+	icon = 'osdrive/icons/generic-program.ico';
+	name = 'clock';
+	processId = 0;
+	type = ComponentType.System;
 
-  constructor(processIdService:ProcessIDService,runningProcessService:RunningProcessService) { 
-    this._processIdService = processIdService;
-    this._runningProcessService = runningProcessService;
-    
-    this.processId = this._processIdService.getNewProcessId()
-    this._runningProcessService.addProcess(this.getComponentDetail());
+	constructor(
+		processIdService: ProcessIDService,
+		runningProcessService: RunningProcessService
+	) {
+		this._processIdService = processIdService;
+		this._runningProcessService = runningProcessService;
 
-    const dateTime = new Date();
-    this._taskBarClock = new Clock(dateTime.getSeconds(),dateTime.getMinutes(),dateTime.getHours());
-  }
+		this.processId = this._processIdService.getNewProcessId();
+		this._runningProcessService.addProcess(this.getComponentDetail());
 
+		const dateTime = new Date();
+		this._taskBarClock = new Clock(
+			dateTime.getSeconds(),
+			dateTime.getMinutes(),
+			dateTime.getHours()
+		);
+	}
 
-  ngAfterViewInit():void {
-    this.oberserableTimer();
-    this.oberserableDate();
-  }
+	ngAfterViewInit(): void {
+		this.oberserableTimer();
+		this.oberserableDate();
+	}
 
-  ngOnDestroy():void {
-    this._timerSubscription?.unsubscribe();
-    this._dateSubscription?.unsubscribe();
-  }
+	ngOnDestroy(): void {
+		this._timerSubscription?.unsubscribe();
+		this._dateSubscription?.unsubscribe();
+	}
 
-  private oberserableTimer():void{
-    this._timerSubscription = timer(50, 1000).subscribe(() => {
-          this._taskBarClock.tick()
-      this.subscribeTime = `${this._taskBarClock.getHourStyle('12hr')}:${this.padSingleDigits(this._taskBarClock.getMinutes)} ${this._taskBarClock.getMeridian}`;
-    });
-  }
+	private oberserableTimer(): void {
+		this._timerSubscription = timer(50, 1000).subscribe(() => {
+			this._taskBarClock.tick();
+			this.subscribeTime = `${this._taskBarClock.getHourStyle('12hr')}:${this.padSingleDigits(this._taskBarClock.getMinutes)} ${this._taskBarClock.getMeridian}`;
+		});
+	}
 
-  private oberserableDate():void{
-    this._dateSubscription = timer(50, 360000).subscribe(() => {
-      const dateTime = new Date();  
-      this.subscribeDate = `${dateTime.getMonth() + 1}/${dateTime.getDate()}/${dateTime.getFullYear()}`;
-    });
-  }
+	private oberserableDate(): void {
+		this._dateSubscription = timer(50, 360000).subscribe(() => {
+			const dateTime = new Date();
+			this.subscribeDate = `${dateTime.getMonth() + 1}/${dateTime.getDate()}/${dateTime.getFullYear()}`;
+		});
+	}
 
-  private padSingleDigits(n:number):string{
-    return n > 9 ? "" + n: "0" + n;
-  }
+	private padSingleDigits(n: number): string {
+		return n > 9 ? '' + n : '0' + n;
+	}
 
-  private getComponentDetail():Process{
-    return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type)
-  }
-
+	private getComponentDetail(): Process {
+		return new Process(
+			this.processId,
+			this.name,
+			this.icon,
+			this.hasWindow,
+			this.type
+		);
+	}
 }

@@ -5,14 +5,20 @@
     {{subscribeTime}}
 </time> -->
 
-<div class="date-and-time-cntnr"
-    [ngStyle]=" hover ? 
-    {'background-color': 'hsla(0,0%,25%,60%)'}:
-    {'color': 'white'}"  (mouseover)="hover=true" (mouseleave)="hover=false">
-    <span class="time-cntnr">
-        {{subscribeTime}}
-    </span>
-    <span class="date-cntnr">
-        {{subscribeDate}}
-    </span>
+<div
+	class="date-and-time-cntnr"
+	[ngStyle]="
+		hover
+			? { 'background-color': 'hsla(0,0%,25%,60%)' }
+			: { color: 'white' }
+	"
+	(mouseover)="hover = true"
+	(mouseleave)="hover = false"
+>
+	<span class="time-cntnr">
+		{{ subscribeTime }}
+	</span>
+	<span class="date-cntnr">
+		{{ subscribeDate }}
+	</span>
 </div>

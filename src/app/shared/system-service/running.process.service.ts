@@ -1,129 +1,123 @@
-import { Injectable } from "@angular/core";
-import { Subject } from "rxjs";
-import { TaskBarPreviewImage } from "src/app/system-apps/taskbarpreview/taskbar.preview";
-import { Process } from "src/app/system-files/process";
-
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+import { TaskBarPreviewImage } from 'src/app/system-apps/taskbarpreview/taskbar.preview';
+import { Process } from 'src/app/system-files/process';
 
 @Injectable({
-    providedIn: 'root'
+	providedIn: 'root',
 })
+export class RunningProcessService {
+	static instance: RunningProcessService;
+	private _runningProcesses: Process[];
+	private _runningProcessesImages: Map<string, TaskBarPreviewImage[]>;
+	private _eventOriginator = '';
 
-export class RunningProcessService{
+	processListChangeNotify: Subject<void> = new Subject<void>();
+	closeProcessNotify: Subject<Process> = new Subject<Process>();
+	focusOnNextProcessNotify: Subject<void> = new Subject<void>();
+	focusOnCurrentProcessNotify: Subject<number> = new Subject<number>();
+	focusOutOtherProcessNotify: Subject<number> = new Subject<number>();
+	restoreOrMinimizeWindowNotify: Subject<number> = new Subject<number>();
+	maximizeWindowNotify: Subject<void> = new Subject<void>();
+	minimizeWindowNotify: Subject<number[]> = new Subject<number[]>();
+	showPreviewWindowNotify: Subject<unknown[]> = new Subject<unknown[]>();
+	hidePreviewWindowNotify: Subject<void> = new Subject<void>();
+	keepPreviewWindowNotify: Subject<void> = new Subject<void>();
 
-    static instance: RunningProcessService;
-    private _runningProcesses:Process[];
-    private _runningProcessesImages:Map<string, TaskBarPreviewImage[]>;
-    private _eventOriginator = '';
+	constructor() {
+		this._runningProcesses = [];
+		this._runningProcessesImages = new Map<string, TaskBarPreviewImage[]>();
+		RunningProcessService.instance = this; //I added this to access the service from a class, not component
+	}
 
-    processListChangeNotify: Subject<void> = new Subject<void>();
-    closeProcessNotify: Subject<Process> = new Subject<Process>();
-    focusOnNextProcessNotify: Subject<void> = new Subject<void>();
-    focusOnCurrentProcessNotify: Subject<number> = new Subject<number>();
-    focusOutOtherProcessNotify: Subject<number> = new Subject<number>();
-    restoreOrMinimizeWindowNotify: Subject<number> = new Subject<number>();
-    maximizeWindowNotify: Subject<void> = new Subject<void>();
-    minimizeWindowNotify: Subject<number[]> = new Subject<number[]>();
-    showPreviewWindowNotify: Subject<unknown[]> = new Subject<unknown[]>();
-    hidePreviewWindowNotify: Subject<void> = new Subject<void>();
-    keepPreviewWindowNotify: Subject<void> = new Subject<void>();
+	addProcess(proccessToAdd: Process): void {
+		this._runningProcesses.push(proccessToAdd);
+	}
 
-    constructor(){
-        this._runningProcesses = [];
-        this._runningProcessesImages = new Map<string, TaskBarPreviewImage[]>();
-        RunningProcessService.instance = this; //I added this to access the service from a class, not component
-    }
+	addProcessImage(appName: string, data: TaskBarPreviewImage): void {
+		if (!this._runningProcessesImages.has(appName)) {
+			const tmpArr: TaskBarPreviewImage[] = [data];
+			this._runningProcessesImages.set(appName, tmpArr);
+		} else {
+			const currImages = this._runningProcessesImages.get(appName) || [];
+			currImages.push(data);
+			this._runningProcessesImages.set(appName, currImages);
+		}
+	}
 
-    addProcess(proccessToAdd:Process):void{
-        this._runningProcesses.push(proccessToAdd)
-    }
+	addEventOriginator(eventOrig: string): void {
+		this._eventOriginator = eventOrig;
+	}
 
-    addProcessImage(appName:string, data:TaskBarPreviewImage):void{
-        if(!this._runningProcessesImages.has(appName)){
-            const tmpArr:TaskBarPreviewImage[] = [data];
-            this._runningProcessesImages.set(appName, tmpArr);
-        }
-        else{
-            const currImages = this._runningProcessesImages.get(appName) || [];
-            currImages.push(data);
-            this._runningProcessesImages.set(appName, currImages);
-        }
-    }
+	removeProcess(proccessToRemove: Process): void {
+		const deleteCount = 1;
+		const procIndex = this._runningProcesses.findIndex((process) => {
+			return process.getProcessId === proccessToRemove.getProcessId;
+		});
 
-    addEventOriginator(eventOrig:string):void{
-        this._eventOriginator = eventOrig;
-    }
+		if (procIndex != -1) {
+			this._runningProcesses.splice(procIndex, deleteCount);
+		}
+	}
 
-    removeProcess(proccessToRemove:Process):void{
-        const deleteCount = 1;
-        const procIndex = this._runningProcesses.findIndex((process) => {
-            return process.getProcessId === proccessToRemove.getProcessId;
-          });
+	removeProcessImages(appName: string): void {
+		if (this._runningProcessesImages.has(appName))
+			this._runningProcessesImages.delete(appName);
+	}
 
-        if(procIndex != -1){
-            this._runningProcesses.splice(procIndex, deleteCount)
-        }
-    }
+	removeProcessImage(appName: string, pid: number): void {
+		const deleteCount = 1;
+		if (this._runningProcessesImages.has(appName)) {
+			const currImages = this._runningProcessesImages.get(appName) || [];
+			const dataIndex = currImages.findIndex((d) => {
+				return d.pid === pid;
+			});
 
-    removeProcessImages(appName:string):void{
-        if(this._runningProcessesImages.has(appName))
-            this._runningProcessesImages.delete(appName);
-    }
+			if (dataIndex != -1) {
+				currImages.splice(dataIndex || 0, deleteCount);
+			}
+		}
+	}
 
-    removeProcessImage(appName:string, pid:number):void{
-        const deleteCount = 1;
-        if(this._runningProcessesImages.has(appName)){
-            const currImages = this._runningProcessesImages.get(appName) || [];
-            const dataIndex = currImages.findIndex((d) => {
-                return d.pid  === pid;
-              });
-    
-            if(dataIndex != -1){
-                currImages.splice(dataIndex || 0, deleteCount)
-            }
-        }    
-    }
+	removeEventOriginator(): void {
+		this._eventOriginator = '';
+	}
 
-    removeEventOriginator():void{
-        this._eventOriginator = '';
-    }
+	getProcess(processId: number): Process {
+		const process = this._runningProcesses.find((process) => {
+			return process.getProcessId === processId;
+		});
 
-    getProcess(processId:number):Process{
-        const process = this._runningProcesses.find((process) => {
-            return process.getProcessId === processId;
-        });
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		return process!;
+	}
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return process!;
-    }
+	getProcessImages(appName: string): TaskBarPreviewImage[] {
+		if (this._runningProcessesImages.has(appName))
+			return this._runningProcessesImages.get(appName) || [];
 
+		return [];
+	}
 
-    getProcessImages(appName:string):TaskBarPreviewImage[]{
-        if(this._runningProcessesImages.has(appName))
-           return this._runningProcessesImages.get(appName) || [];
+	getEventOrginator(): string {
+		return this._eventOriginator;
+	}
 
-        return [];
-    }
+	isProcessRunning(appName: string): boolean {
+		const process = this._runningProcesses.find((process) => {
+			return process.getProcessName === appName;
+		});
 
-    getEventOrginator():string{
-        return this._eventOriginator;
-    }
+		if (process) return true;
 
-    isProcessRunning(appName:string):boolean{
-        const process = this._runningProcesses.find((process) => {
-            return process.getProcessName === appName;
-        });
+		return false;
+	}
 
-        if(process)
-            return true;
-        
-        return false;
-    }
+	getProcesses(): Process[] {
+		return this._runningProcesses;
+	}
 
-    getProcesses():Process[]{
-        return this._runningProcesses;
-    }
-
-    processCount():number{
-        return this._runningProcesses.length;
-    }
+	processCount(): number {
+		return this._runningProcesses.length;
+	}
 }
