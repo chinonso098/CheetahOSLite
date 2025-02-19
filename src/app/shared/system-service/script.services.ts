@@ -29,9 +29,7 @@ export class ScriptService {
 		for (let i = 0; i <= names.length - 1; i++) {
 			if (!this.scripts[names[i]]) {
 				this.scripts[names[i]] = { name: names[i], src: srcs[i] };
-				const res = await this.loadExternalScript(
-					this.scripts[names[i]]
-				);
+				const res = await this.loadExternalScript(this.scripts[names[i]]);
 				promises.push(res);
 			}
 		}

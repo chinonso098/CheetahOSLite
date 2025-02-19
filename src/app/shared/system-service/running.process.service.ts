@@ -61,8 +61,7 @@ export class RunningProcessService {
 	}
 
 	removeProcessImages(appName: string): void {
-		if (this._runningProcessesImages.has(appName))
-			this._runningProcessesImages.delete(appName);
+		if (this._runningProcessesImages.has(appName)) this._runningProcessesImages.delete(appName);
 	}
 
 	removeProcessImage(appName: string, pid: number): void {

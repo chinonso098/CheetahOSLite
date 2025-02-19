@@ -1,10 +1,4 @@
-import {
-	ChangeDetectorRef,
-	Component,
-	Input,
-	OnChanges,
-	SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ComponentType } from 'src/app/system-files/component.types';
 import { NotificationService } from '../../system-service/notification.service';
 import { NotificationType } from 'src/app/system-files/notification.type';
@@ -44,9 +38,7 @@ export class DialogComponent implements OnChanges {
 	}
 
 	onCloseDialogBox(): void {
-		this._notificationServices.closeDialogBoxNotify.next(
-			this.notificationId
-		);
+		this._notificationServices.closeDialogBoxNotify.next(this.notificationId);
 	}
 
 	private generateNotificationId(): number {

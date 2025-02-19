@@ -1,11 +1,4 @@
-import {
-	AfterViewInit,
-	OnInit,
-	OnDestroy,
-	Component,
-	ElementRef,
-	ViewChild,
-} from '@angular/core';
+import { AfterViewInit, OnInit, OnDestroy, Component, ElementRef, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ProcessIDService } from 'src/app/shared/system-service/process.id.service';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
@@ -19,18 +12,9 @@ import { FileInfo } from 'src/app/system-files/fileinfo';
 import { TriggerProcessService } from 'src/app/shared/system-service/trigger.process.service';
 import { ScriptService } from 'src/app/shared/system-service/script.services';
 import { MenuService } from 'src/app/shared/system-service/menu.services';
-import {
-	NestedMenu,
-	NestedMenuItem,
-} from 'src/app/shared/system-component/menu/menu.item';
+import { NestedMenu, NestedMenuItem } from 'src/app/shared/system-component/menu/menu.item';
 import * as files from 'src/app/shared/system-service/file.service';
-import {
-	trigger,
-	state,
-	style,
-	transition,
-	animate,
-} from '@angular/animations';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
 	selector: 'cos-desktop',
@@ -154,34 +138,24 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 		this._scriptService = scriptService;
 		this._menuService = menuService;
 
-		this._showTaskBarMenuSub = this._menuService.showTaskBarMenu.subscribe(
-			(p) => {
-				this.onShowTaskBarContextMenu(p);
-			}
-		);
+		this._showTaskBarMenuSub = this._menuService.showTaskBarMenu.subscribe((p) => {
+			this.onShowTaskBarContextMenu(p);
+		});
 		this._showTaskBarPreviewWindowSub =
-			this._runningProcessService.showPreviewWindowNotify.subscribe(
-				(p) => {
-					this.showTaskBarPreviewWindow(p);
-				}
-			);
-		this._hideContextMenuSub = this._menuService.hideContextMenus.subscribe(
-			() => {
-				this.hideContextMenu();
-			}
-		);
+			this._runningProcessService.showPreviewWindowNotify.subscribe((p) => {
+				this.showTaskBarPreviewWindow(p);
+			});
+		this._hideContextMenuSub = this._menuService.hideContextMenus.subscribe(() => {
+			this.hideContextMenu();
+		});
 		this._hideTaskBarPreviewWindowSub =
-			this._runningProcessService.hidePreviewWindowNotify.subscribe(
-				() => {
-					this.hideTaskBarPreviewWindow();
-				}
-			);
+			this._runningProcessService.hidePreviewWindowNotify.subscribe(() => {
+				this.hideTaskBarPreviewWindow();
+			});
 		this._keepTaskBarPreviewWindowSub =
-			this._runningProcessService.keepPreviewWindowNotify.subscribe(
-				() => {
-					this.keepTaskBarPreviewWindow();
-				}
-			);
+			this._runningProcessService.keepPreviewWindowNotify.subscribe(() => {
+				this.keepTaskBarPreviewWindow();
+			});
 
 		this.processId = this._processIdService.getNewProcessId();
 		this._runningProcessService.addProcess(this.getComponentDetail());
@@ -198,24 +172,15 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	changeAnimationColor(): void {
-		this.CURRENT_DEG =
-			this.CURRENT_DEG > this.MAX_DEG
-				? this.MIN_DEG
-				: this.CURRENT_DEG + 1;
+		this.CURRENT_DEG = this.CURRENT_DEG > this.MAX_DEG ? this.MIN_DEG : this.CURRENT_DEG + 1;
 
 		console.log(
 			'nextColor:',
-			Number(
-				this.nextColor
-					.changeHue('#4f32c2', this.CURRENT_DEG)
-					?.replace('#', '0x')
-			)
+			Number(this.nextColor.changeHue('#4f32c2', this.CURRENT_DEG)?.replace('#', '0x'))
 		);
 		this._vantaEffect.setOptions({
 			color: Number(
-				this.nextColor
-					.changeHue('#4f32c2', this.CURRENT_DEG)
-					?.replace('#', '0x')
+				this.nextColor.changeHue('#4f32c2', this.CURRENT_DEG)?.replace('#', '0x')
 			),
 		});
 
@@ -363,17 +328,13 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	autoArrangeIcon(): void {
 		this.autoArrangeIcons = !this.autoArrangeIcons;
-		this._fileManagerServices.autoArrangeIconsNotify.next(
-			this.autoArrangeIcons
-		);
+		this._fileManagerServices.autoArrangeIconsNotify.next(this.autoArrangeIcons);
 		this.getDesktopMenuData();
 	}
 
 	autoAlignIcon(): void {
 		this.autoAlignIcons = !this.autoAlignIcons;
-		this._fileManagerServices.alignIconsToGridNotify.next(
-			this.autoAlignIcons
-		);
+		this._fileManagerServices.alignIconsToGridNotify.next(this.autoAlignIcons);
 		this.getDesktopMenuData();
 	}
 
@@ -383,9 +344,7 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	showDesktopIcon(): void {
 		this.showDesktopIcons = !this.showDesktopIcons;
-		this._fileManagerServices.showDesktopIconsNotify.next(
-			this.showDesktopIcons
-		);
+		this._fileManagerServices.showDesktopIconsNotify.next(this.showDesktopIcons);
 		this.getDesktopMenuData();
 	}
 
@@ -414,18 +373,22 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	async onPaste(): Promise<void> {
-		const cntntPath = this._menuService.getPath();
-		const action = this._menuService.getActions();
+		const cntntPath = this._menuService.path;
+		const action = this._menuService.actions;
 
 		console.log(`path: ${cntntPath}`);
 		console.log(`action: ${action}`);
 
-		if (action === 'copy') {
-			const result = await files.copyHandler(cntntPath, this.directory);
-			if (result) {
-				this.refresh();
+		try {
+			switch (action) {
+				case 'copy':
+					await files.copy(cntntPath, this.directory);
+					this.refresh();
+					break;
+				case 'cut':
 			}
-		} else if (action === 'cut') {
+		} catch (err) {
+			console.error(err);
 		}
 	}
 
@@ -435,7 +398,7 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 		file.opensWith = arg0;
 
 		if (arg0 == this.markDownViewerApp) {
-			file.currentPath = '/Desktop';
+			file.path = '/Desktop';
 			file.contentPath = '/Documents/Credits.md';
 		}
 
@@ -546,12 +509,7 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 			styleOption: 'A',
 		};
 
-		const sortByMenu = [
-			sortByName,
-			sortBySize,
-			sortByItemType,
-			sortByDateModified,
-		];
+		const sortByMenu = [sortByName, sortBySize, sortByItemType, sortByDateModified];
 
 		return sortByMenu;
 	}
@@ -864,12 +822,6 @@ export class DesktopComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

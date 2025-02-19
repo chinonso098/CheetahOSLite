@@ -22,10 +22,7 @@ export class StartButtonComponent implements OnInit {
 	type = ComponentType.System;
 	displayName = '';
 
-	constructor(
-		processIdService: ProcessIDService,
-		runningProcessService: RunningProcessService
-	) {
+	constructor(processIdService: ProcessIDService, runningProcessService: RunningProcessService) {
 		this._processIdService = processIdService;
 		this._runningProcessService = runningProcessService;
 		this.processId = this._processIdService.getNewProcessId();
@@ -37,12 +34,6 @@ export class StartButtonComponent implements OnInit {
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

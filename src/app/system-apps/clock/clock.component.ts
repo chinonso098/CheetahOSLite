@@ -29,10 +29,7 @@ export class ClockComponent implements AfterViewInit, OnDestroy {
 	processId = 0;
 	type = ComponentType.System;
 
-	constructor(
-		processIdService: ProcessIDService,
-		runningProcessService: RunningProcessService
-	) {
+	constructor(processIdService: ProcessIDService, runningProcessService: RunningProcessService) {
 		this._processIdService = processIdService;
 		this._runningProcessService = runningProcessService;
 
@@ -76,12 +73,6 @@ export class ClockComponent implements AfterViewInit, OnDestroy {
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

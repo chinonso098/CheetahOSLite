@@ -15,10 +15,7 @@ import { ComponentType } from 'src/app/system-files/component.types';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
 import { Subscription } from 'rxjs';
 import { StateManagmentService } from 'src/app/shared/system-service/state.management.service';
-import {
-	BaseState,
-	WindowState,
-} from 'src/app/system-files/state/state.interface';
+import { BaseState, WindowState } from 'src/app/system-files/state/state.interface';
 import {
 	openCloseAnimation,
 	hideShowAnimation,
@@ -33,17 +30,11 @@ import { TaskBarPreviewImage } from 'src/app/system-apps/taskbarpreview/taskbar.
 @Component({
 	selector: 'cos-window',
 	templateUrl: './window.component.html',
-	animations: [
-		openCloseAnimation,
-		hideShowAnimation,
-		minimizeMaximizeAnimation,
-	],
+	animations: [openCloseAnimation, hideShowAnimation, minimizeMaximizeAnimation],
 	styleUrls: ['./window.component.css'],
 	standalone: false,
 })
-export class WindowComponent
-	implements OnInit, OnChanges, AfterViewInit, OnDestroy
-{
+export class WindowComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
 	@ViewChild('divWindow') divWindow!: ElementRef;
 
 	@Input() runningProcessID = 0;
@@ -120,30 +111,23 @@ export class WindowComponent
 
 		this.retrievePastSessionData();
 
-		this._restoreOrMinSub =
-			this._runningProcessService.restoreOrMinimizeWindowNotify.subscribe(
-				(p) => {
-					this.restoreHiddenWindow(p);
-				}
-			);
+		this._restoreOrMinSub = this._runningProcessService.restoreOrMinimizeWindowNotify.subscribe(
+			(p) => {
+				this.restoreHiddenWindow(p);
+			}
+		);
 		this._focusOnNextProcessSub =
-			this._runningProcessService.focusOnNextProcessNotify.subscribe(
-				() => {
-					this.setNextWindowToFocus();
-				}
-			);
+			this._runningProcessService.focusOnNextProcessNotify.subscribe(() => {
+				this.setNextWindowToFocus();
+			});
 		this._focusOnCurrentProcessSub =
-			this._runningProcessService.focusOnCurrentProcessNotify.subscribe(
-				(p) => {
-					this.setFocusOnWindow(p);
-				}
-			);
+			this._runningProcessService.focusOnCurrentProcessNotify.subscribe((p) => {
+				this.setFocusOnWindow(p);
+			});
 		this._focusOutOtherProcessSub =
-			this._runningProcessService.focusOutOtherProcessNotify.subscribe(
-				(p) => {
-					this.removeFocusOnWindow(p);
-				}
-			);
+			this._runningProcessService.focusOutOtherProcessNotify.subscribe((p) => {
+				this.removeFocusOnWindow(p);
+			});
 	}
 
 	get getDivWindowElement(): HTMLElement {
@@ -233,27 +217,16 @@ export class WindowComponent
 		if (this.windowHide) {
 			if (windowState.pid == this.processId) {
 				windowState.is_visible = false;
-				this._stateManagmentService.addState(
-					this.uniqueId,
-					windowState,
-					StateType.Window
-				);
+				this._stateManagmentService.addState(this.uniqueId, windowState, StateType.Window);
 			}
 		} else if (!this.windowHide) {
 			if (windowState.pid == this.processId) {
 				if (this.currentWindowSizeState) {
 					// if window was in full screen when hidden, give the proper z-index when unhidden
-					this.setWindowToFullScreen(
-						this.processId,
-						windowState.z_index
-					);
+					this.setWindowToFullScreen(this.processId, windowState.z_index);
 				}
 				windowState.is_visible = true;
-				this._stateManagmentService.addState(
-					this.uniqueId,
-					windowState,
-					StateType.Window
-				);
+				this._stateManagmentService.addState(this.uniqueId, windowState, StateType.Window);
 			}
 		}
 	}
@@ -379,11 +352,7 @@ export class WindowComponent
 			this.xAxisTmp = x_axis;
 			this.yAxisTmp = y_axis;
 			this.windowTransform = `translate(${String(x_axis)}px , ${String(y_axis)}px)`;
-			this._stateManagmentService.addState(
-				this.uniqueId,
-				windowState,
-				StateType.Window
-			);
+			this._stateManagmentService.addState(this.uniqueId, windowState, StateType.Window);
 		}
 	}
 
@@ -405,11 +374,7 @@ export class WindowComponent
 		this.windowWidth = `${String(width)}px`;
 		this.windowHeight = `${String(height)}px`;
 
-		this._stateManagmentService.addState(
-			this.uniqueId,
-			windowState,
-			StateType.Window
-		);
+		this._stateManagmentService.addState(this.uniqueId, windowState, StateType.Window);
 	}
 
 	generateCloseAnimationValues(x_axis: number, y_axis: number): void {
@@ -433,9 +398,7 @@ export class WindowComponent
 		this.generateCloseAnimationValues(this.xAxisTmp, this.yAxisTmp);
 
 		setTimeout(() => {
-			const processToClose = this._runningProcessService.getProcess(
-				this.processId
-			);
+			const processToClose = this._runningProcessService.getProcess(this.processId);
 			this._runningProcessService.closeProcessNotify.next(processToClose);
 			this._runningProcessService.focusOnNextProcessNotify.next();
 		}, this.SECONDS_DELAY);
@@ -478,9 +441,7 @@ export class WindowComponent
 	}
 
 	setWindowToFocusById(pid: number): void {
-		let z_index = this._stateManagmentService.getState(
-			this.z_index
-		) as number;
+		let z_index = this._stateManagmentService.getState(this.z_index) as number;
 
 		const uid = `${this.name}-${pid}`;
 		const windowState = this._stateManagmentService.getState(
@@ -494,11 +455,7 @@ export class WindowComponent
 					this._stateManagmentService.addState(this.z_index, z_index);
 
 				windowState.z_index = z_index;
-				this._stateManagmentService.addState(
-					this.uniqueId,
-					windowState,
-					StateType.Window
-				);
+				this._stateManagmentService.addState(this.uniqueId, windowState, StateType.Window);
 
 				this.currentStyles = {
 					'z-index': z_index,
@@ -531,17 +488,14 @@ export class WindowComponent
 	retrievePastSessionData(): void {
 		const pickUpKey = this._sessionManagmentService._pickUpKey;
 		if (this._sessionManagmentService.hasTempSession(pickUpKey)) {
-			const tmpSessKey =
-				this._sessionManagmentService.getTempSession(pickUpKey) || '';
+			const tmpSessKey = this._sessionManagmentService.getTempSession(pickUpKey) || '';
 
-			const retrievedSessionData =
-				this._sessionManagmentService.getSession(
-					tmpSessKey
-				) as BaseState[];
+			const retrievedSessionData = this._sessionManagmentService.getSession(
+				tmpSessKey
+			) as BaseState[];
 
 			if (retrievedSessionData !== undefined) {
-				const windowSessionData =
-					retrievedSessionData[1] as WindowState;
+				const windowSessionData = retrievedSessionData[1] as WindowState;
 
 				if (windowSessionData !== undefined) {
 					// this.currentStyles = {

@@ -56,21 +56,17 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 
 		this.processId = this._processIdService.getNewProcessId();
 		this._runningProcessService.addProcess(this.getComponentDetail());
-		this._processListChangeSub =
-			this._runningProcessService.processListChangeNotify.subscribe(
-				() => {
-					this.updateRunningProcess();
-				}
-			);
-		this._addIconToTaskbarSub = this._menuService.pinToTaskBar.subscribe(
-			(p) => {
-				this.pinIconToTaskBarList(p);
+		this._processListChangeSub = this._runningProcessService.processListChangeNotify.subscribe(
+			() => {
+				this.updateRunningProcess();
 			}
 		);
-		this._removeIconFromTaskbarSub =
-			this._menuService.unPinFromTaskBar.subscribe((p) => {
-				this.unPinIconFromTaskBarList(p);
-			});
+		this._addIconToTaskbarSub = this._menuService.pinToTaskBar.subscribe((p) => {
+			this.pinIconToTaskBarList(p);
+		});
+		this._removeIconFromTaskbarSub = this._menuService.unPinFromTaskBar.subscribe((p) => {
+			this.unPinIconFromTaskBarList(p);
+		});
 		this._openApplicationFromTaskbarSub =
 			this._menuService.openApplicationFromTaskBar.subscribe((p) => {
 				this.openApplication(p);
@@ -136,11 +132,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 		 * else, put object in a different list
 		 */
 		uniqueProccesses.forEach((x) => {
-			if (
-				this.pinToTaskBarList.some(
-					(i) => i.opensWith === x.getProcessName
-				)
-			) {
+			if (this.pinToTaskBarList.some((i) => i.opensWith === x.getProcessName)) {
 				this.appProcessId = x.getProcessId;
 				this.setIconState(x.getProcessName, true);
 			} else {
@@ -161,11 +153,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 			.getProcesses()
 			.filter((p) => p.getHasWindow == true)
 			.forEach((x) => {
-				if (
-					!uniqueProccesses.some(
-						(a) => a.getProcessName === x.getProcessName
-					)
-				) {
+				if (!uniqueProccesses.some((a) => a.getProcessName === x.getProcessName)) {
 					uniqueProccesses.push(x);
 				}
 			});
@@ -193,13 +181,9 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 	}
 
 	setIconState(appName: string, isActive: boolean) {
-		const liElemnt = document.getElementById(
-			`tskbar-${appName}`
-		) as HTMLElement;
+		const liElemnt = document.getElementById(`tskbar-${appName}`) as HTMLElement;
 		if (liElemnt) {
-			if (isActive)
-				liElemnt.style.borderBottomColor =
-					'hsl(207deg 100%  72% / 90%)';
+			if (isActive) liElemnt.style.borderBottomColor = 'hsl(207deg 100%  72% / 90%)';
 			else liElemnt.style.borderBottomColor = 'transparent';
 		}
 	}
@@ -214,9 +198,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 			const process = this._runningProcessService
 				.getProcesses()
 				.filter((x) => x.getProcessName === file.opensWith);
-			this._runningProcessService.restoreOrMinimizeWindowNotify.next(
-				process[0].getProcessId
-			);
+			this._runningProcessService.restoreOrMinimizeWindowNotify.next(process[0].getProcessId);
 		}
 	}
 
@@ -234,9 +216,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 		/* My hand was forced, I had to let the desktop display the taskbar context menu.
 		 * This is due to the fact that the taskbar has a max height of 40px, which is not enough room to display the context menu
 		 */
-		const liElemnt = document.getElementById(
-			`tskbar-${file.opensWith}`
-		) as HTMLElement;
+		const liElemnt = document.getElementById(`tskbar-${file.opensWith}`) as HTMLElement;
 		const rect = liElemnt.getBoundingClientRect();
 		const isPinned = true;
 		const data: unknown[] = [rect, file, isPinned];
@@ -271,9 +251,7 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 
 	onMouseEnter(appName: string, iconPath: string, caller: string): void {
 		const prefix = caller === 'pinned' ? 'tskbar' : 'tskbar-UnPinned';
-		const liElemnt = document.getElementById(
-			`${prefix}-${appName}`
-		) as HTMLElement;
+		const liElemnt = document.getElementById(`${prefix}-${appName}`) as HTMLElement;
 		const rect = liElemnt.getBoundingClientRect();
 		const data: unknown[] = [rect, appName, iconPath];
 
@@ -286,18 +264,10 @@ export class TaskBarEntriesComponent implements AfterViewInit, OnDestroy {
 	}
 
 	restoreOrMinizeWindow(processId: number) {
-		this._runningProcessService.restoreOrMinimizeWindowNotify.next(
-			processId
-		);
+		this._runningProcessService.restoreOrMinimizeWindowNotify.next(processId);
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

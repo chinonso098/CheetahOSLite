@@ -9,10 +9,7 @@
 	position: absolute;
 	top: 40%;
 	left: 15%;
-	transform: translate(
-		-50%,
-		-50%
-	); /* Move the element back by 50% of its own width and height */
+	transform: translate(-50%, -50%); /* Move the element back by 50% of its own width and height */
 	outline: 1px hsl(0deg 0% 20%/70%);
 	z-index: 2;
 }

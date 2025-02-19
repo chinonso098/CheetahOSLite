@@ -1,11 +1,4 @@
-import {
-	Directive,
-	ElementRef,
-	Output,
-	EventEmitter,
-	OnInit,
-	OnDestroy,
-} from '@angular/core';
+import { Directive, ElementRef, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { fromEvent, Subscription } from 'rxjs';
 import { buffer, debounceTime, filter } from 'rxjs/operators';
 
@@ -21,10 +14,7 @@ export class KeyPressCaptureDirective implements OnInit, OnDestroy {
 	constructor(private el: ElementRef) {}
 
 	ngOnInit() {
-		const keyPress$ = fromEvent<KeyboardEvent>(
-			this.el.nativeElement,
-			'keydown'
-		);
+		const keyPress$ = fromEvent<KeyboardEvent>(this.el.nativeElement, 'keydown');
 
 		this.keyPressSubscription = keyPress$
 			.pipe(
@@ -34,8 +24,7 @@ export class KeyPressCaptureDirective implements OnInit, OnDestroy {
 			.subscribe((events) => {
 				//console.log('events-keyPress$:', events );
 				//this.keyDblPressed.emit(events.length);
-				if (events[0].key === events[1].key)
-					this.keyDblPressed.emit(events[0]);
+				if (events[0].key === events[1].key) this.keyDblPressed.emit(events[0]);
 			});
 	}
 

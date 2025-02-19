@@ -28,8 +28,7 @@ export class HighlightDirective {
 	private highlight(color: string, xBtnColor: string) {
 		if (this.el.nativeElement.id == 'closeBtn') {
 			this.el.nativeElement.style.backgroundColor = xBtnColor;
-			this.el.nativeElement.style.transition =
-				'background-color 0.3s ease';
+			this.el.nativeElement.style.transition = 'background-color 0.3s ease';
 			this.el.nativeElement.focus();
 		} else if (
 			this.el.nativeElement.id == 'hideBtn' ||

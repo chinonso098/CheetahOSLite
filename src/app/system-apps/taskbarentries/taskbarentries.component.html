@@ -21,9 +21,7 @@
 		taskBarEntryHighlight
 		*ngFor="let rProcess of runningProcess"
 		id="tskbar-UnPinned-{{ rProcess.getProcessName }}"
-		(mouseenter)="
-			onMouseEnter(rProcess.getProcessName, rProcess.getIcon, unPinned)
-		"
+		(mouseenter)="onMouseEnter(rProcess.getProcessName, rProcess.getIcon, unPinned)"
 		(mouseleave)="onMouseLeave()"
 		(contextmenu)="onShowUnPinnedIconContextMenu($event, rProcess)"
 	>
