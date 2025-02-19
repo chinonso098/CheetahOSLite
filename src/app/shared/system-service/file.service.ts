@@ -1,7 +1,5 @@
-import { basename, extname, resolve } from '@zenfs/core/vfs/path.js';
+import { basename, extname, join, resolve } from '@zenfs/core/vfs/path.js';
 import * as constants from 'src/app/system-files/constants';
-import { FileMetaData } from 'src/app/system-files/file.metadata';
-import { FileEntry } from 'src/app/system-files/fileentry';
 import { FileInfo } from 'src/app/system-files/fileinfo';
 import { ShortCut } from 'src/app/system-files/shortcut';
 
@@ -9,20 +7,22 @@ import { Buffer } from 'buffer';
 import ini from 'ini';
 import { Subject } from 'rxjs';
 
-import type { ErrnoError, IndexData } from '@zenfs/core';
+import type { Dirent, ErrnoError, IndexData, Stats } from '@zenfs/core';
 import { configure, CopyOnWrite, Fetch, default as fs } from '@zenfs/core';
 import { IndexedDB } from '@zenfs/dom';
 import OSFileSystemIndex from '../../../../index.json';
 /// <reference types="node" />
 
-const configured = configure({
+const fsPrefix = '/osdrive';
+
+export const configured = configure({
 	mounts: {
 		'/': {
 			backend: CopyOnWrite,
 			readable: {
 				backend: Fetch,
 				index: OSFileSystemIndex as IndexData,
-				baseUrl: 'http://localhost:4200/osdrive',
+				baseUrl: 'http://localhost:4200' + fsPrefix,
 			},
 			writable: {
 				backend: IndexedDB,
@@ -41,195 +41,86 @@ function throwWithPath(error: ErrnoError): never {
 export const dirFilesReadyNotify: Subject<void> = new Subject<void>();
 export const dirFilesUpdateNotify: Subject<void> = new Subject<void>();
 
-async function changeFolderIcon(
-	fileName: string,
-	iconPath: string
-): Promise<string> {
-	await configured;
-	const baseUrl = '/osdrive';
-	const iconMaybe = `/icons/${fileName.toLocaleLowerCase()}_folder.ico`;
-	return fs.existsSync(iconMaybe) ? `${baseUrl}${iconMaybe}` : iconPath;
-}
-
-export async function checkIfDirectory(path: string): Promise<boolean> {
+export async function isDir(path: string): Promise<boolean> {
 	await configured;
 	const stats = await fs.promises.stat(path).catch(throwWithPath);
 	return stats.isDirectory();
 }
 
-export async function checkIfExistsAsync(dirPath: string): Promise<boolean> {
+export async function exists(dirPath: string): Promise<boolean> {
 	await configured;
 	return fs.promises.exists(dirPath).catch(throwWithPath);
 }
 
-export async function copyFileAsync(
-	sourcePath: string,
-	destinationPath: string
-): Promise<boolean> {
+export async function copy(source: string, destination: string): Promise<void> {
 	await configured;
-	const fileName = basename(sourcePath);
-	console.log(`Destination: ${destinationPath}/${fileName}`);
-	await fs.promises
-		.copyFile(sourcePath, `${destinationPath}/${fileName}`)
-		.catch(throwWithPath);
-	return true;
+	const stats = await fs.promises.stat(destination);
+	if (stats.isDirectory()) destination = join(destination, basename(source));
+	await fs.promises.cp(source, destination).catch(throwWithPath);
 }
 
-export async function copyHandler(
-	sourcePathArg: string,
-	destinationArg: string
-): Promise<boolean> {
-	const checkIfDirResult = await checkIfDirectory(`${sourcePathArg}`);
-	if (checkIfDirResult) {
-		// ignoring directories for now
-	} else {
-		const result = await copyFileAsync(
-			`${sourcePathArg}`,
-			`${destinationArg}`
-		);
-		if (result) {
-			console.log(
-				`file:${sourcePathArg} successfully copied to destination:${destinationArg}`
-			);
-		} else {
-			console.log(
-				`file:${sourcePathArg} failed to copy to destination:${destinationArg}`
-			);
-			return false;
-		}
-	}
-
-	return true;
-}
-
-export async function getExtraFileMetaDataAsync(path: string) {
-	await configured;
-	const stats = await fs.promises.stat(path).catch(throwWithPath);
-	return new FileMetaData(stats.ctime, stats.mtime, stats.size, stats.mode);
-}
-
-export async function getEntriesFromDirectoryAsync(
-	path: string
-): Promise<string[]> {
-	if (!path) {
-		console.error(
-			'getEntriesFromDirectoryAsync error: Path must not be empty'
-		);
-		return Promise.reject(new Error('Path must not be empty'));
-	}
-
+export async function readdir(path: string): Promise<string[]> {
 	await configured;
 	return await fs.promises.readdir(path).catch(throwWithPath);
 }
 
-export function getFileEntriesFromDirectory(
-	fileList: string[],
-	directory: string
-): FileEntry[] {
-	let _directoryFileEntires: FileEntry[] = [];
-
-	for (let i = 0; i < fileList.length; i++) {
-		const file = fileList[i];
-
-		_directoryFileEntires.push({
-			name: basename(file, extname(file)),
-			path: resolve(directory, file),
-		});
-	}
-	return _directoryFileEntires;
-}
-
-export async function getFileInfoAsync(path: string): Promise<FileInfo> {
-	const extension = extname(path);
-	const _fileInfo = new FileInfo();
+async function fileInfo(fullPath: string, entry: Dirent): Promise<FileInfo> {
+	const extension = extname(fullPath);
+	const info = new FileInfo(entry);
 
 	if (!extension) {
-		const sc = await setFolderValuesAsync(path);
-		const fileMetaData = await getExtraFileMetaDataAsync(path);
+		const iconFile = '/osdrive/icons/' + (entry.isDirectory() ? 'folder.ico' : 'unknown.ico');
+		const iconMaybe = `/icons/${entry.name.toLocaleLowerCase()}_folder.ico`;
+		info.iconPath = fs.existsSync(iconMaybe) ? fsPrefix + iconMaybe : iconFile;
 
-		_fileInfo.iconPath = await changeFolderIcon(sc.fileName, sc.iconPath);
-		_fileInfo.currentPath = path;
-		_fileInfo.fileType = sc.fileType;
-		_fileInfo.fileName = sc.fileName;
-		_fileInfo.opensWith = sc.opensWith;
-		_fileInfo.isFile = false;
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
-		return _fileInfo;
+		info.fileType = 'folder';
+		info.opensWith = 'fileexplorer';
+		return info;
 	}
-
-	const fileMetaData = await getExtraFileMetaDataAsync(path);
 
 	if (extension == '.url') {
-		const sc = await getShortCutFromURLAsync(path);
-		_fileInfo.iconPath = sc.iconPath;
-		_fileInfo.currentPath = path;
-		_fileInfo.contentPath = sc.contentPath;
-		_fileInfo.fileType = sc.fileType;
-		_fileInfo.fileName = basename(path, extname(path));
-		_fileInfo.opensWith = sc.opensWith;
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
+		const sc = await shortcutFromURL(fullPath);
+		Object.assign(info, sc);
 	} else if (constants.IMAGE_FILE_EXTENSIONS.includes(extension)) {
-		const sc = await getShortCutFromB64DataUrlAsync(path, 'image');
-		_fileInfo.iconPath = sc.iconPath;
-		_fileInfo.currentPath = path;
-		_fileInfo.contentPath = sc.contentPath;
-		_fileInfo.fileType = extension;
-		_fileInfo.fileName = sc.fileName;
-		_fileInfo.opensWith = 'photoviewer';
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
+		const sc = await shortcutFromB64DataUrl(fullPath, 'image');
+		info.iconPath = sc.iconPath;
+		info.contentPath = sc.contentPath;
+		info.fileType = extension;
+		info.opensWith = 'photoviewer';
 	} else if (constants.VIDEO_FILE_EXTENSIONS.includes(extension)) {
-		const sc = await getShortCutFromB64DataUrlAsync(path, 'video');
-		_fileInfo.iconPath = '/osdrive/icons/video_file.ico';
-		_fileInfo.currentPath = path;
-		_fileInfo.contentPath = sc.contentPath;
-		_fileInfo.fileType = extension;
-		_fileInfo.fileName = sc.fileName;
-		_fileInfo.opensWith = 'videoplayer';
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
+		const sc = await shortcutFromB64DataUrl(fullPath, 'video');
+		info.iconPath = '/osdrive/icons/video_file.ico';
+		info.contentPath = sc.contentPath;
+		info.fileType = extension;
+		info.opensWith = 'videoplayer';
 	} else if (constants.AUDIO_FILE_EXTENSIONS.includes(extension)) {
-		const sc = await getShortCutFromB64DataUrlAsync(path, 'audio');
-		_fileInfo.iconPath = '/osdrive/icons/music_file.ico';
-		_fileInfo.currentPath = path;
-		_fileInfo.contentPath = sc.contentPath;
-		_fileInfo.fileType = extension;
-		_fileInfo.fileName = sc.fileName;
-		_fileInfo.opensWith = 'audioplayer';
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
+		const sc = await shortcutFromB64DataUrl(fullPath, 'audio');
+		info.iconPath = '/osdrive/icons/music_file.ico';
+		info.contentPath = sc.contentPath;
+		info.fileType = extension;
+		info.opensWith = 'audioplayer';
 	} else if (extension == '.txt' || extension == '.properties') {
-		_fileInfo.iconPath = '/osdrive/icons/file.ico';
-		_fileInfo.currentPath = path;
-		_fileInfo.fileType = extname(path);
-		_fileInfo.fileName = basename(path, extname(path));
-		_fileInfo.opensWith = 'texteditor';
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
+		info.iconPath = '/osdrive/icons/file.ico';
+		info.fileType = extname(fullPath);
+		info.opensWith = 'texteditor';
 	} else {
-		_fileInfo.iconPath = '/osdrive/icons/unknown.ico';
-		_fileInfo.currentPath = path;
-		_fileInfo.fileName = basename(path, extname(path));
-		_fileInfo.dateModified = fileMetaData.modifiedDate;
-		_fileInfo.size = fileMetaData.size;
-		_fileInfo.mode = fileMetaData.mode;
+		info.iconPath = '/osdrive/icons/unknown.ico';
 	}
 
-	return _fileInfo;
+	return info;
 }
 
-export async function getShortCutFromB64DataUrlAsync(
-	path: string,
-	contentType: string
-): Promise<ShortCut> {
+export async function* directoryInfo(path: string): AsyncIterableIterator<FileInfo> {
+	await configured;
+	if (path == '/fileexplorer.url') debugger;
+	for (const entry of await fs.promises
+		.readdir(path, { withFileTypes: true })
+		.catch(throwWithPath)) {
+		yield await fileInfo(join(path, entry.path), entry);
+	}
+}
+
+export async function shortcutFromB64DataUrl(path: string, contentType: string): Promise<ShortCut> {
 	await configured;
 	const contents = await fs.promises.readFile(path).catch(throwWithPath);
 
@@ -239,7 +130,7 @@ export async function getShortCutFromB64DataUrlAsync(
 			iconPath: '',
 			fileName: basename(path, extname(path)),
 			fileType: '',
-			contentPath: bufferToUrl2(contents),
+			contentPath: URL.createObjectURL(new Blob([contents])),
 			opensWith: '',
 		};
 	}
@@ -251,20 +142,18 @@ export async function getShortCutFromB64DataUrlAsync(
 	) {
 		// Extract Base64-encoded string from Data URL
 		const base64Data = contents.toString().split(',')[1];
-		const encoding: BufferEncoding = 'base64';
-		const cntntData = Buffer.from(base64Data, encoding);
-		const fileUrl = bufferToUrl(cntntData);
+		const contentData = Buffer.from(base64Data, 'base64');
+		const fileUrl = URL.createObjectURL(new Blob([new Uint8Array(contentData)]));
 
 		return {
-			iconPath:
-				stringData.substring(0, 10) == 'data:image' ? fileUrl : '',
+			iconPath: stringData.substring(0, 10) == 'data:image' ? fileUrl : '',
 			fileName: basename(path, extname(path)),
 			fileType: '',
 			contentPath: fileUrl,
 			opensWith: '',
 		};
 	} else {
-		const fileUrl = bufferToUrl2(contents);
+		const fileUrl = URL.createObjectURL(new Blob([contents]));
 		return {
 			iconPath: contentType === 'image' ? fileUrl : '',
 			fileName: basename(path, extname(path)),
@@ -275,7 +164,7 @@ export async function getShortCutFromB64DataUrlAsync(
 	}
 }
 
-export async function getShortCutFromURLAsync(path: string): Promise<ShortCut> {
+export async function shortcutFromURL(path: string): Promise<ShortCut> {
 	await configured;
 	const contents = await fs.promises.readFile(path).catch(throwWithPath);
 
@@ -298,60 +187,14 @@ export async function getShortCutFromURLAsync(path: string): Promise<ShortCut> {
 			opensWith: '',
 		};
 	}
-	const iSCut = (shortCut as { InternetShortcut: unknown })?.[
-		'InternetShortcut'
-	];
-	const fileName = (iSCut as { FileName: unknown })?.['FileName'] as string;
-	const iconPath = (iSCut as { IconPath: unknown })?.['IconPath'] as string;
-	const fileType = (iSCut as { FileType: unknown })?.['FileType'] as string;
-	const contentPath = (iSCut as { ContentPath: unknown })?.[
-		'ContentPath'
-	] as string;
-	const opensWith = (iSCut as { OpensWith: unknown })?.[
-		'OpensWith'
-	] as string;
+	const iSCut = (shortCut as { InternetShortcut: any })?.InternetShortcut;
 	return {
-		iconPath,
-		fileName,
-		fileType,
-		contentPath,
-		opensWith,
+		iconPath: iSCut?.IconPath,
+		fileName: iSCut?.FileName,
+		fileType: iSCut?.FileType,
+		contentPath: iSCut?.ContentPath,
+		opensWith: iSCut?.OpensWith,
 	};
-}
-
-export async function setFolderValuesAsync(path: string): Promise<ShortCut> {
-	await configured;
-	const exists = await fs.promises.exists(path).catch(throwWithPath);
-
-	if (!exists) {
-		return {
-			iconPath: '',
-			fileName: '',
-			fileType: '',
-			contentPath: '',
-			opensWith: '',
-		};
-	}
-
-	const stats = await fs.promises.stat(path).catch(throwWithPath);
-	const iconFile = `/osdrive/icons/${stats.isDirectory() ? 'folder.ico' : 'unknown.ico'}`;
-	const fileType = 'folder';
-	const opensWith = 'fileexplorer';
-	return {
-		iconPath: iconFile,
-		fileName: basename(path, extname(path)),
-		fileType: fileType,
-		contentPath: basename(path, extname(path)),
-		opensWith: opensWith,
-	};
-}
-
-function bufferToUrl(buffer: Buffer): string {
-	return URL.createObjectURL(new Blob([new Uint8Array(buffer)]));
-}
-
-function bufferToUrl2(arr: Uint8Array): string {
-	return URL.createObjectURL(new Blob([arr]));
 }
 
 function isUtf8Encoded(data: string): boolean {
@@ -366,16 +209,8 @@ function isUtf8Encoded(data: string): boolean {
 	}
 }
 
-let _eventOriginator = '';
+export let eventOriginator = '';
 
-export function addEventOriginator(eventOrig: string): void {
-	_eventOriginator = eventOrig;
-}
-
-export function getEventOrginator(): string {
-	return _eventOriginator;
-}
-
-export function removeEventOriginator(): void {
-	_eventOriginator = '';
+export function setEventOriginator(eventOrig: string): void {
+	eventOriginator = eventOrig;
 }

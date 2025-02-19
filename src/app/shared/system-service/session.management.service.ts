@@ -12,9 +12,7 @@ export class SessionManagmentService {
 
 	constructor() {
 		if (sessionStorage.getItem(this._sessionName)) {
-			const sessData = sessionStorage.getItem(
-				this._sessionName
-			) as string;
+			const sessData = sessionStorage.getItem(this._sessionName) as string;
 			this._sessionDataDict = new Map(JSON.parse(sessData));
 			SessionManagmentService.instance = this;
 		} else {

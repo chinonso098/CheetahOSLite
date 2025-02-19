@@ -55,10 +55,7 @@ Because of the dynamic nature of React and lack of standard route definition syn
 		<div>
 			<Switch>
 				<Redirect exact={true} from="/" to="/intro" />
-				<Route
-					path="/intro"
-					component={AsyncComponent(() => import('./intro/Intro'))}
-				/>
+				<Route path="/intro" component={AsyncComponent(() => import('./intro/Intro'))} />
 				<Route path="/main" component={Main} />
 			</Switch>
 		</div>

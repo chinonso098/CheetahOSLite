@@ -28,63 +28,24 @@
 				</div>
 			</ng-container>
 
-			<div
-				class="terminal-command-output-container-main"
-				#terminalHistoryOutput
-			>
-				<ng-container *ngFor="let cmdHistory of commandHistory">
+			<div class="terminal-command-output-container-main" #terminalHistoryOutput>
+				<ng-container *ngFor="let entry of history">
 					<div class="terminal-command-output-container">
-						<ng-container
-							*ngIf="
-								cmdHistory.getResponseCode === this.Success ||
-								cmdHistory.getResponseCode === this.Options
-							"
-						>
+						<ng-container *ngIf="!entry.status">
 							<div class="terminal-command-output">
-								<span
-									class="prev-terminal-prompt terminal-prior"
-									>{{ terminalPrompt }}:{{
-										cmdHistory.getCommand.trim()
-									}}</span
+								<span class="prev-terminal-prompt terminal-prior"
+									>{{ terminalPrompt }}{{ entry.input }}</span
 								>
-								<div class="prev-terminal-output">
-									{{ cmdHistory.getCommandOutput.trim() }}
-								</div>
+								<div class="prev-terminal-output">{{ entry.output }}</div>
 							</div>
 						</ng-container>
-
-						<ng-container
-							*ngIf="cmdHistory.getResponseCode === this.Fail"
-						>
+						<ng-container *ngIf="entry.status">
 							<div class="terminal-command-output">
-								<span
-									class="prev-terminal-prompt terminal-prior"
-									>{{ terminalPrompt }}:{{
-										cmdHistory.getCommand.trim()
-									}}</span
+								<span class="prev-terminal-prompt terminal-prior"
+									>{{ terminalPrompt }}$ {{ entry.input }}</span
 								>
-								<div
-									class="prev-terminal-output terminal-error"
-								>
-									{{ cmdHistory.getCommandOutput.trim() }}
-								</div>
-							</div>
-						</ng-container>
-
-						<ng-container
-							*ngIf="cmdHistory.getResponseCode === this.Warning"
-						>
-							<div class="terminal-command-output">
-								<span
-									class="prev-terminal-prompt terminal-prior"
-									>{{ terminalPrompt }}:{{
-										cmdHistory.getCommand.trim()
-									}}</span
-								>
-								<div
-									class="prev-terminal-output terminal-warning"
-								>
-									{{ cmdHistory.getCommandOutput.trim() }}
+								<div class="prev-terminal-output terminal-error">
+									{{ entry.output }}
 								</div>
 							</div>
 						</ng-container>

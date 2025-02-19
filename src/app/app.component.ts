@@ -101,42 +101,33 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 		this._notificationServices = notificationServices;
 		this._stateManagmentService = stateManagmentService;
 
-		this._startProcessSub =
-			this._triggerProcessService.startProcessNotify.subscribe(
-				(appName) => {
-					this.loadApps(appName);
-				}
-			);
-		this._appNotFoundSub =
-			this._triggerProcessService.appNotFoundNotify.subscribe(
-				(appName) => {
-					this.showDialogMsgBox(NotificationType.Error, appName);
-				}
-			);
-		this._appIsRunningSub =
-			this._triggerProcessService.appIsRunningNotify.subscribe(
-				(appName) => {
-					this.showDialogMsgBox(NotificationType.Info, appName);
-				}
-			);
-		this._errorNotifySub = this._notificationServices.errorNotify.subscribe(
+		this._startProcessSub = this._triggerProcessService.startProcessNotify.subscribe(
+			(appName) => {
+				this.loadApps(appName);
+			}
+		);
+		this._appNotFoundSub = this._triggerProcessService.appNotFoundNotify.subscribe(
 			(appName) => {
 				this.showDialogMsgBox(NotificationType.Error, appName);
 			}
 		);
-		this._infoNotifySub = this._notificationServices.InfoNotify.subscribe(
+		this._appIsRunningSub = this._triggerProcessService.appIsRunningNotify.subscribe(
 			(appName) => {
 				this.showDialogMsgBox(NotificationType.Info, appName);
 			}
 		);
-		this._closeProcessSub =
-			this._runningProcessService.closeProcessNotify.subscribe((p) => {
-				this.onCloseBtnClicked(p);
-			});
-		this._closeMsgDialogSub =
-			this._notificationServices.closeDialogBoxNotify.subscribe((i) => {
-				this.closeDialogMsgBox(i);
-			});
+		this._errorNotifySub = this._notificationServices.errorNotify.subscribe((appName) => {
+			this.showDialogMsgBox(NotificationType.Error, appName);
+		});
+		this._infoNotifySub = this._notificationServices.InfoNotify.subscribe((appName) => {
+			this.showDialogMsgBox(NotificationType.Info, appName);
+		});
+		this._closeProcessSub = this._runningProcessService.closeProcessNotify.subscribe((p) => {
+			this.onCloseBtnClicked(p);
+		});
+		this._closeMsgDialogSub = this._notificationServices.closeDialogBoxNotify.subscribe((i) => {
+			this.closeDialogMsgBox(i);
+		});
 		this._runningProcessService.addProcess(this.getComponentDetail());
 
 		this._appDirectory = new AppDirectory();
@@ -168,29 +159,21 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 
 	private async lazyLoadComponment(appPosition: number) {
 		const componentToLoad = this.apps[appPosition];
-		const componentRef =
-			this.itemViewContainer.createComponent<BaseComponent>(
-				componentToLoad.type
-			);
+		const componentRef = this.itemViewContainer.createComponent<BaseComponent>(
+			componentToLoad.type
+		);
 		const pid = componentRef.instance.processId;
 		this.addEntryFromUserOpenedApps(componentRef.instance.name);
-		this._componentReferenceService.addComponentReference(
-			pid,
-			componentRef
-		);
+		this._componentReferenceService.addComponentReference(pid, componentRef);
 
 		//alert subscribers
 		this._runningProcessService.processListChangeNotify.next();
 	}
 
 	private showDialogMsgBox(dialogMsgType: string, msg: string): void {
-		const componentRef =
-			this.itemViewContainer.createComponent(DialogComponent);
+		const componentRef = this.itemViewContainer.createComponent(DialogComponent);
 		const notificationId = componentRef.instance.notificationId;
-		this._componentReferenceService.addComponentReference(
-			notificationId,
-			componentRef
-		);
+		this._componentReferenceService.addComponentReference(notificationId, componentRef);
 
 		if (dialogMsgType === NotificationType.Error) {
 			componentRef.setInput('inputMsg', msg);
@@ -202,18 +185,16 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 	}
 
 	private closeDialogMsgBox(dialogId: number): void {
-		const componentToDelete =
-			this._componentReferenceService.getComponentReference(dialogId);
+		const componentToDelete = this._componentReferenceService.getComponentReference(dialogId);
 		this._componentRefView = componentToDelete.hostView;
 		const iVCntr = this.itemViewContainer.indexOf(this._componentRefView);
 		this.itemViewContainer.remove(iVCntr);
 	}
 
 	onCloseBtnClicked(eventData: Process): void {
-		const componentToDelete =
-			this._componentReferenceService.getComponentReference(
-				eventData.getProcessId
-			);
+		const componentToDelete = this._componentReferenceService.getComponentReference(
+			eventData.getProcessId
+		);
 		this._componentRefView = componentToDelete.hostView;
 		const iVCntr = this.itemViewContainer.indexOf(this._componentRefView);
 		this.itemViewContainer.remove(iVCntr);
@@ -227,9 +208,7 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 			eventData.getProcessId
 		);
 
-		this._componentReferenceService.removeComponentReference(
-			eventData.getProcessId
-		);
+		this._componentReferenceService.removeComponentReference(eventData.getProcessId);
 		this._processIdService.removeProcessId(eventData.getProcessId);
 		this.deleteEntryFromUserOpenedAppsAndSession(eventData);
 
@@ -237,28 +216,16 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 
 	private deleteEntryFromUserOpenedAppsAndSession(proccess: Process): void {
 		const deleteCount = 1;
-		const pidIndex = this.userOpenedAppsList.indexOf(
-			proccess.getProcessName
-		);
+		const pidIndex = this.userOpenedAppsList.indexOf(proccess.getProcessName);
 
-		if (pidIndex !== -1)
-			this.userOpenedAppsList.splice(pidIndex, deleteCount);
+		if (pidIndex !== -1) this.userOpenedAppsList.splice(pidIndex, deleteCount);
 
-		this._sessionMangamentServices.addSession(
-			this.userOpenedAppsKey,
-			this.userOpenedAppsList
-		);
+		this._sessionMangamentServices.addSession(this.userOpenedAppsKey, this.userOpenedAppsList);
 		const uid = `${proccess.getProcessName}-${proccess.getProcessId}`;
 		this._sessionMangamentServices.removeSession(uid);
 	}
@@ -268,8 +235,7 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 			this.userOpenedAppsKey
 		) as string[];
 
-		if (openedAppList != null || openedAppList != undefined)
-			return openedAppList;
+		if (openedAppList != null || openedAppList != undefined) return openedAppList;
 
 		return [];
 	}
@@ -279,12 +245,9 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 			const sessionKeys = this._sessionMangamentServices.getKeys();
 
 			for (let i = 0; i < priorOpendApps.length; i++) {
-				const tmpKey = sessionKeys.filter((x) =>
-					x.includes(priorOpendApps[i])
-				);
+				const tmpKey = sessionKeys.filter((x) => x.includes(priorOpendApps[i]));
 
-				for (let j = 0; j < tmpKey.length; j++)
-					this.retreivedKeys.push(tmpKey[j]);
+				for (let j = 0; j < tmpKey.length; j++) this.retreivedKeys.push(tmpKey[j]);
 			}
 		}
 
@@ -302,18 +265,14 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 				for (i; i < pSessionData.length; i++) {
 					if (tmpCounter < 1) {
 						const appName = priorSessionData[i].split('-')[0];
-						this._sessionMangamentServices.addSession(
-							pickUpKey,
-							priorSessionData[i]
-						);
+						this._sessionMangamentServices.addSession(pickUpKey, priorSessionData[i]);
 						this.loadApps(appName);
 
 						tmpCounter++;
 					}
 				}
 
-				if (this.reOpendAppsCounter == pSessionData.length - 1)
-					clearInterval(interval);
+				if (this.reOpendAppsCounter == pSessionData.length - 1) clearInterval(interval);
 
 				this.reOpendAppsCounter++;
 			},
@@ -324,9 +283,6 @@ export class AppComponent implements OnDestroy, AfterViewInit {
 
 	private addEntryFromUserOpenedApps(proccessName: string): void {
 		this.userOpenedAppsList.push(proccessName);
-		this._sessionMangamentServices.addSession(
-			this.userOpenedAppsKey,
-			this.userOpenedAppsList
-		);
+		this._sessionMangamentServices.addSession(this.userOpenedAppsKey, this.userOpenedAppsList);
 	}
 }

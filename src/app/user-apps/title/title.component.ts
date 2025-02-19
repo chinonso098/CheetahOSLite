@@ -1,10 +1,4 @@
-import {
-	Component,
-	ElementRef,
-	ViewChild,
-	OnDestroy,
-	AfterViewInit,
-} from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ProcessIDService } from 'src/app/shared/system-service/process.id.service';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
@@ -35,20 +29,16 @@ export class TitleComponent implements BaseComponent, OnDestroy, AfterViewInit {
 	type = ComponentType.User;
 	displayName = 'Hello';
 
-	constructor(
-		processIdService: ProcessIDService,
-		runningProcessService: RunningProcessService
-	) {
+	constructor(processIdService: ProcessIDService, runningProcessService: RunningProcessService) {
 		this._processIdService = processIdService;
 		this._runningProcessService = runningProcessService;
 
 		this.processId = this._processIdService.getNewProcessId();
 		this._runningProcessService.addProcess(this.getComponentDetail());
 
-		this._maximizeWindowSub =
-			this._runningProcessService.maximizeWindowNotify.subscribe(() => {
-				this.maximizeWindow();
-			});
+		this._maximizeWindowSub = this._runningProcessService.maximizeWindowNotify.subscribe(() => {
+			this.maximizeWindow();
+		});
 	}
 
 	ngAfterViewInit(): void {
@@ -94,12 +84,6 @@ export class TitleComponent implements BaseComponent, OnDestroy, AfterViewInit {
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

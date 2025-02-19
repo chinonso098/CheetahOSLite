@@ -4,10 +4,7 @@
 	(mouseenter)="keepTaskBarPreviewWindow()"
 	(mouseleave)="hideTaskBarPreviewWindow()"
 >
-	<div
-		class="taskbar-preview-content"
-		*ngFor="let cmpntImage of componentImages"
-	>
+	<div class="taskbar-preview-content" *ngFor="let cmpntImage of componentImages">
 		<div class="taskbar-preview-header-container" tabindex="0">
 			<div class="taskbar-preview-left-header-section">
 				<h1 class="taskbar-preview-h1">
@@ -28,11 +25,7 @@
 						(click)="onClosePreviewWindow(cmpntImage.pid)"
 						title="Close"
 					>
-						<svg
-							class="taskbar-preview-svg"
-							width="10"
-							viewBox="0 0 10 10"
-						>
+						<svg class="taskbar-preview-svg" width="10" viewBox="0 0 10 10">
 							<path
 								d="M10.2.7L9.5 0 5.1 4.4.7 0 0 .7l4.4 4.4L0 9.5l.7.7 4.4-4.4 4.4 4.4.7-.7-4.4-4.4z"
 								fill="#FFFFF"
@@ -44,9 +37,7 @@
 		</div>
 		<div
 			class="taskbar-preview-image-container"
-			(contextmenu)="
-				showTaskBarPreviewContextMenu($event, cmpntImage.pid)
-			"
+			(contextmenu)="showTaskBarPreviewContextMenu($event, cmpntImage.pid)"
 			(mouseenter)="setWindowToFocus(cmpntImage.pid)"
 		>
 			<figure class="taskbar-preview-figure1">

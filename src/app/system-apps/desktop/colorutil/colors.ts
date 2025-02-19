@@ -27,11 +27,7 @@ export class Colors {
 		const finalRgbColor = this.hslToRgb(hslColor.h, hslColor.s, hslColor.l);
 
 		// Convert RGB back to hexadecimal
-		const finalHexColor = this.rgbToHex(
-			finalRgbColor.r,
-			finalRgbColor.g,
-			finalRgbColor.b
-		);
+		const finalHexColor = this.rgbToHex(finalRgbColor.r, finalRgbColor.g, finalRgbColor.b);
 
 		return `#${finalHexColor}`;
 	}

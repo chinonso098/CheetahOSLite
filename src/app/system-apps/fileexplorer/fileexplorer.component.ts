@@ -22,16 +22,10 @@ import { FileManagerService } from 'src/app/shared/system-service/file.manager.s
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ViewOptions } from './fileexplorer.enums';
 import { basename } from '@zenfs/core/vfs/path.js';
-import {
-	AppState,
-	BaseState,
-} from 'src/app/system-files/state/state.interface';
+import { AppState, BaseState } from 'src/app/system-files/state/state.interface';
 import { StateType } from 'src/app/system-files/state/state.type';
 import { SessionManagmentService } from 'src/app/shared/system-service/session.management.service';
-import {
-	NestedMenu,
-	NestedMenuItem,
-} from 'src/app/shared/system-component/menu/menu.item';
+import { NestedMenu, NestedMenuItem } from 'src/app/shared/system-component/menu/menu.item';
 import { IMAGE_FILE_EXTENSIONS } from 'src/app/system-files/constants';
 import * as htmlToImage from 'html-to-image';
 import { TaskBarPreviewImage } from '../taskbarpreview/taskbar.preview';
@@ -45,9 +39,7 @@ import { SortBys } from '../desktop/desktop.enums';
 	encapsulation: ViewEncapsulation.None,
 	standalone: false,
 })
-export class FileExplorerComponent
-	implements BaseComponent, OnInit, AfterViewInit, OnDestroy
-{
+export class FileExplorerComponent implements BaseComponent, OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('fileExplorerMainContainer', { static: true })
 	fileExplrMainCntnr!: ElementRef;
 	@ViewChild('fileExplorerRootContainer', { static: true })
@@ -230,27 +222,21 @@ export class FileExplorerComponent
 		this.retrievePastSessionData();
 
 		this._dirFilesUpdatedSub = files.dirFilesUpdateNotify.subscribe(() => {
-			if (files.getEventOrginator() === this.name) {
-				this.loadFilesInfoAsync();
-				files.removeEventOriginator();
+			if (files.eventOriginator === this.name) {
+				this.loadFiles();
+				files.setEventOriginator('');
 			}
 		});
 
-		this._sortByNotifySub = fileManagerService.sortByNotify.subscribe(
-			(p) => {
-				this.sortIcons(p);
-			}
-		);
-		this._refreshNotifySub = fileManagerService.refreshNotify.subscribe(
-			() => {
-				this.refreshIcons();
-			}
-		);
-		this._hideContextMenuSub = this._menuService.hideContextMenus.subscribe(
-			() => {
-				this.onHideIconContextMenu();
-			}
-		);
+		this._sortByNotifySub = fileManagerService.sortByNotify.subscribe((p) => {
+			this.sortIcons(p);
+		});
+		this._refreshNotifySub = fileManagerService.refreshNotify.subscribe(() => {
+			this.refreshIcons();
+		});
+		this._hideContextMenuSub = this._menuService.hideContextMenus.subscribe(() => {
+			this.onHideIconContextMenu();
+		});
 	}
 
 	ngOnInit(): void {
@@ -258,10 +244,7 @@ export class FileExplorerComponent
 
 		if (this._fileInfo) {
 			// is this a URL or and Actual Folder
-			if (
-				this._fileInfo.opensWith === 'fileexplorer' &&
-				!this._fileInfo.isFile
-			)
+			if (this._fileInfo.opensWith === 'fileexplorer' && !this._fileInfo.isFile())
 				//Actual Folder
 				this.directory = this._fileInfo.currentPath;
 		}
@@ -290,7 +273,7 @@ export class FileExplorerComponent
 			pathInput: this.directory !== '/' ? this.directory : '/',
 		});
 
-		await this.loadFilesInfoAsync().then(() => {
+		await this.loadFiles().then(() => {
 			setTimeout(() => {
 				this.captureComponentImg();
 			}, this.SECONDS_DELAY[4]);
@@ -308,20 +291,15 @@ export class FileExplorerComponent
 	}
 
 	captureComponentImg(): void {
-		htmlToImage
-			.toPng(this.fileExplorerRootContainer.nativeElement)
-			.then((htmlImg) => {
-				//console.log('img data:',htmlImg);
+		htmlToImage.toPng(this.fileExplorerRootContainer.nativeElement).then((htmlImg) => {
+			//console.log('img data:',htmlImg);
 
-				const cmpntImg: TaskBarPreviewImage = {
-					pid: this.processId,
-					imageData: htmlImg,
-				};
-				this._runningProcessService.addProcessImage(
-					this.name,
-					cmpntImg
-				);
-			});
+			const cmpntImg: TaskBarPreviewImage = {
+				pid: this.processId,
+				imageData: htmlImg,
+			};
+			this._runningProcessService.addProcessImage(this.name, cmpntImg);
+		});
 	}
 
 	colorTabLayoutContainer(): void {
@@ -499,9 +477,7 @@ export class FileExplorerComponent
 		const iconIdx = icon_sizes.indexOf(iconView);
 		const btnIdx = iconIdx <= 2 ? 0 : 1;
 
-		const olElmnt = document.getElementById(
-			`olElmnt-${this.processId}`
-		) as HTMLElement;
+		const olElmnt = document.getElementById(`olElmnt-${this.processId}`) as HTMLElement;
 
 		if (
 			iconView == this.smallIconsView ||
@@ -518,8 +494,7 @@ export class FileExplorerComponent
 				olElmnt.style.gridAutoFlow = 'row';
 			}
 		} else if (iconView == this.contentView) {
-			const rect =
-				this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
+			const rect = this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
 			if (olElmnt) {
 				olElmnt.style.gridTemplateColumns = `repeat(auto-fill, minmax(50px, ${rect.width}px)`;
 				olElmnt.style.gridTemplateRows = 'repeat(auto-fill, 43px)';
@@ -610,7 +585,7 @@ export class FileExplorerComponent
 
 			this.populateHopsList();
 			this.setNavPathIcon(folderName, this.directory);
-			await this.loadFilesInfoAsync();
+			await this.loadFiles();
 		}
 	}
 
@@ -676,7 +651,7 @@ export class FileExplorerComponent
 
 			this.populateHopsList();
 			this.setNavPathIcon(folderName, this.directory);
-			await this.loadFilesInfoAsync();
+			await this.loadFiles();
 		}
 	}
 
@@ -707,8 +682,7 @@ export class FileExplorerComponent
 				fill: '#fff',
 			};
 
-			const nextDirPath = (this.directory =
-				this.nextPathEntries.pop() ?? '');
+			const nextDirPath = (this.directory = this.nextPathEntries.pop() ?? '');
 			const idx = this.upPathEntries.indexOf(nextDirPath);
 
 			if (idx !== -1) {
@@ -734,7 +708,7 @@ export class FileExplorerComponent
 
 			this.populateHopsList();
 			this.setNavPathIcon(folderName, this.directory);
-			await this.loadFilesInfoAsync();
+			await this.loadFiles();
 		}
 	}
 
@@ -752,22 +726,8 @@ export class FileExplorerComponent
 		}
 	}
 
-	private async loadFilesInfoAsync(): Promise<void> {
-		this.files = [];
-		const directoryEntries = await files.getEntriesFromDirectoryAsync(
-			this.directory
-		);
-		this._directoryFilesEntires = files.getFileEntriesFromDirectory(
-			directoryEntries,
-			this.directory
-		);
-
-		for (let i = 0; i < directoryEntries.length; i++) {
-			const fileEntry = this._directoryFilesEntires[i];
-			const fileInfo = await files.getFileInfoAsync(fileEntry.path);
-
-			this.files.push(fileInfo);
-		}
+	async loadFiles() {
+		this.files = await Array.fromAsync(files.directoryInfo(this.directory));
 	}
 
 	async runProcess(file: FileInfo): Promise<void> {
@@ -775,36 +735,34 @@ export class FileExplorerComponent
 		this.showInformationTip = false;
 		// console.log('what was clicked:',file.getFileName +'-----' + file.getOpensWith +'---'+ file.getCurrentPath +'----'+ file.getIcon) TBD
 		if (
-			file.opensWith === 'fileexplorer' &&
-			file.fileName !== 'fileexplorer' &&
-			file.fileType === 'folder'
+			file.opensWith != 'fileexplorer' ||
+			file.name == 'fileexplorer.url' ||
+			file.fileType !== 'folder'
 		) {
-			if (!this.isNavigatedBefore) {
-				this.prevPathEntries.push(this.directory);
-				this.upPathEntries.push(this.directory);
-				this.isNavigatedBefore = true;
-			}
-
-			this.isPrevBtnActive = true;
-			this.directory = file.currentPath;
-			this.displayName = file.fileName;
-			this.icon = file.iconPath;
-
-			this.prevPathEntries.push(this.directory);
-			this.upPathEntries.push(this.directory);
-
-			if (this.recentPathEntries.indexOf(this.directory) == -1) {
-				this.recentPathEntries.push(this.directory);
-			}
-
-			this.populateHopsList();
-			this.setNavPathIcon(file.fileName, file.currentPath);
-			this.storeAppState(file.currentPath);
-
-			await this.loadFilesInfoAsync();
-		} else {
 			this._triggerProcessService.startApplication(file);
 		}
+
+		if (!this.isNavigatedBefore) {
+			this.prevPathEntries.push(this.directory);
+			this.upPathEntries.push(this.directory);
+			this.isNavigatedBefore = true;
+		}
+
+		this.isPrevBtnActive = true;
+		this.directory = file.currentPath;
+		this.displayName = file.name;
+		this.icon = file.iconPath;
+
+		this.prevPathEntries.push(this.directory);
+		this.upPathEntries.push(this.directory);
+
+		if (this.recentPathEntries.indexOf(this.directory) == -1) {
+			this.recentPathEntries.push(this.directory);
+		}
+
+		this.populateHopsList();
+		this.setNavPathIcon(file.name, file.currentPath);
+		this.storeAppState(file.currentPath);
 	}
 
 	setNavPathIcon(fileName: string, directory: string) {
@@ -852,8 +810,7 @@ export class FileExplorerComponent
 		const menuHeight = 213; //this is not ideal.. menu height should be gotten dynmically
 		this.iconCntxtCntr++;
 
-		const rect =
-			this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
+		const rect = this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
 		const axis = this.checkAndHandleMenuBounds(rect, evt, menuHeight);
 
 		const uid = `${this.name}-${this.processId}`;
@@ -863,8 +820,7 @@ export class FileExplorerComponent
 		this.isIconInFocusDueToPriorAction = false;
 		this.showInformationTip = false;
 
-		if (!this.showIconCntxtMenu)
-			this.showIconCntxtMenu = !this.showIconCntxtMenu;
+		if (!this.showIconCntxtMenu) this.showIconCntxtMenu = !this.showIconCntxtMenu;
 
 		// show IconContexMenu is still a btn click, just a different type
 		this.doBtnClickThings(id);
@@ -887,8 +843,7 @@ export class FileExplorerComponent
 		this._menuService.hideContextMenus.next();
 		const menuHeight = 230; //this is not ideal.. menu height should be gotten dynmically
 
-		const rect =
-			this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
+		const rect = this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
 		const axis = this.checkAndHandleMenuBounds(rect, evt, menuHeight);
 
 		const uid = `${this.name}-${this.processId}`;
@@ -923,8 +878,7 @@ export class FileExplorerComponent
 				this.isFormDirty();
 			}
 			if (this.isIconInFocusDueToPriorAction) {
-				if (this.hideCntxtMenuEvtCnt >= 0)
-					this.setBtnStyle(this.selectedElementId, false);
+				if (this.hideCntxtMenuEvtCnt >= 0) this.setBtnStyle(this.selectedElementId, false);
 			}
 			if (!this.isRenameActive) {
 				this.isBtnClickEvt = false;
@@ -987,10 +941,7 @@ export class FileExplorerComponent
 
 		if (id != this.selectedElementId) {
 			this.removeBtnStyle(id);
-		} else if (
-			id == this.selectedElementId &&
-			this.isIconInFocusDueToPriorAction
-		) {
+		} else if (id == this.selectedElementId && this.isIconInFocusDueToPriorAction) {
 			this.setBtnStyle(id, false);
 		}
 	}
@@ -1135,9 +1086,7 @@ export class FileExplorerComponent
 	}
 
 	shiftNestedMenuPosition(i: number): void {
-		const nestedMenu = document.getElementById(
-			`dmNestedMenu-${i}`
-		) as HTMLDivElement;
+		const nestedMenu = document.getElementById(`dmNestedMenu-${i}`) as HTMLDivElement;
 		if (nestedMenu) {
 			if (this.isShiftSubMenuLeft) nestedMenu.style.left = '-98%';
 		}
@@ -1171,12 +1120,11 @@ export class FileExplorerComponent
 			this.files = this.files.sort((objA, objB) => objB.size - objA.size);
 		} else if (sortBy === 'Date Modified') {
 			this.files = this.files.sort(
-				(objA, objB) =>
-					objB.dateModified.getTime() - objA.dateModified.getTime()
+				(objA, objB) => objB.mtime.getTime() - objA.mtime.getTime()
 			);
 		} else if (sortBy === 'Name') {
 			this.files = this.files.sort((objA, objB) => {
-				return objA.fileName < objB.fileName ? -1 : 1;
+				return objA.name < objB.name ? -1 : 1;
 			});
 		} else if (sortBy === 'Item Type') {
 			this.files = this.files.sort((objA, objB) => {
@@ -1187,8 +1135,7 @@ export class FileExplorerComponent
 
 	// this method is gross
 	displayInformationTip(evt: MouseEvent, file: FileInfo): void {
-		const rect =
-			this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
+		const rect = this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
 		const x = evt.clientX - rect.left - 15;
 		const y = evt.clientY - rect.top + 10;
 
@@ -1229,10 +1176,6 @@ export class FileExplorerComponent
 			'Type:',
 		];
 		const fileAuthor = 'Relampago Del Catatumbo';
-		const fileType = file.fileType;
-		const fileDateModified = file.dateModifiedUS;
-		const fileSize = `${String(file.size1)}  ${file.fileSizeUnit}`;
-		const fileName = file.fileName;
 
 		//reset
 		this.fileInfoTipData = [];
@@ -1254,46 +1197,42 @@ export class FileExplorerComponent
 			});
 			this.fileInfoTipData.push({
 				label: infoTipFields[6],
-				data: fileSize,
+				data: file.prettySize,
 			});
 		}
 
-		if (fileType === '.txt') {
+		if (file.fileType === '.txt') {
 			this.fileInfoTipData.push({
 				label: infoTipFields[7],
 				data: 'Text Document',
 			});
 			this.fileInfoTipData.push({
 				label: infoTipFields[3],
-				data: fileDateModified,
+				data: file.lastModified,
 			});
 			this.fileInfoTipData.push({
 				label: infoTipFields[6],
-				data: fileSize,
+				data: file.prettySize,
 			});
 		}
 
-		if (fileType === 'folder') {
-			if (
-				fileName === 'Desktop' ||
-				fileName === 'Documents' ||
-				fileName === 'Downloads'
-			) {
+		if (file.fileType === 'folder') {
+			if (file.name === 'Desktop' || file.name === 'Documents' || file.name === 'Downloads') {
 				this.fileInfoTipData.push({
 					label: infoTipFields[2],
-					data: fileDateModified,
+					data: file.lastModified,
 				});
-			} else if (fileName === 'Music') {
+			} else if (file.name === 'Music') {
 				this.fileInfoTipData.push({
 					label: '',
 					data: 'Contains music and other audio files',
 				});
-			} else if (fileName === 'Videos') {
+			} else if (file.name === 'Videos') {
 				this.fileInfoTipData.push({
 					label: '',
 					data: 'Contains movies and other video files',
 				});
-			} else if (fileName === 'Pictures') {
+			} else if (file.name === 'Pictures') {
 				this.fileInfoTipData.push({
 					label: '',
 					data: 'Contains digital photos, images and graphic files',
@@ -1301,11 +1240,11 @@ export class FileExplorerComponent
 			} else {
 				this.fileInfoTipData.push({
 					label: infoTipFields[7],
-					data: fileType,
+					data: file.fileType,
 				});
 				this.fileInfoTipData.push({
 					label: infoTipFields[2],
-					data: fileDateModified,
+					data: file.lastModified,
 				});
 			}
 		}
@@ -1313,13 +1252,13 @@ export class FileExplorerComponent
 
 	async refreshIcons(): Promise<void> {
 		this.isIconInFocusDueToPriorAction = false;
-		await this.loadFilesInfoAsync();
+		await this.loadFiles();
 	}
 
 	async onDeleteFile(): Promise<void> {
 		let result = false;
 		if (result) {
-			await this.loadFilesInfoAsync();
+			await this.loadFiles();
 		}
 	}
 
@@ -1525,8 +1464,7 @@ export class FileExplorerComponent
 			`renameContainer-${this.processId}-${this.selectedElementId}`
 		) as HTMLElement;
 
-		const fileRect =
-			this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
+		const fileRect = this.fileExplrCntntCntnr.nativeElement.getBoundingClientRect();
 		const rect = renameContainerElement.getBoundingClientRect();
 
 		const x = rect.left - fileRect.left;
@@ -1587,7 +1525,7 @@ export class FileExplorerComponent
 
 		if (renameContainerElement) {
 			renameContainerElement.style.display = 'block';
-			this.currentIconName = this.selectedFile.fileName;
+			this.currentIconName = this.selectedFile.name;
 			this.renameForm.setValue({
 				renameInput: this.currentIconName,
 			});
@@ -1701,29 +1639,20 @@ export class FileExplorerComponent
 			unique_id: uid,
 		};
 
-		this._stateManagmentService.addState(
-			uid,
-			this._appState,
-			StateType.App
-		);
+		this._stateManagmentService.addState(uid, this._appState, StateType.App);
 	}
 
 	retrievePastSessionData(): void {
 		const pickUpKey = this._sessionManagmentService._pickUpKey;
 		if (this._sessionManagmentService.hasTempSession(pickUpKey)) {
-			const tmpSessKey =
-				this._sessionManagmentService.getTempSession(pickUpKey) || '';
-			const retrievedSessionData =
-				this._sessionManagmentService.getSession(
-					tmpSessKey
-				) as BaseState[];
+			const tmpSessKey = this._sessionManagmentService.getTempSession(pickUpKey) || '';
+			const retrievedSessionData = this._sessionManagmentService.getSession(
+				tmpSessKey
+			) as BaseState[];
 
 			if (retrievedSessionData !== undefined) {
 				const appSessionData = retrievedSessionData[0] as AppState;
-				if (
-					appSessionData !== undefined &&
-					appSessionData.app_data != ''
-				) {
+				if (appSessionData !== undefined && appSessionData.app_data != '') {
 					this.directory = appSessionData.app_data as string;
 				}
 			}
@@ -1904,12 +1833,7 @@ export class FileExplorerComponent
 			styleOption: 'A',
 		};
 
-		const sortByMenu = [
-			sortByName,
-			sortBySize,
-			sortByItemType,
-			sortByDateModified,
-		];
+		const sortByMenu = [sortByName, sortBySize, sortByItemType, sortByDateModified];
 
 		return sortByMenu;
 	}
@@ -2016,12 +1940,6 @@ export class FileExplorerComponent
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

@@ -25,11 +25,11 @@
 			<figure>
 				<img
 					[src]="file.iconPath | safeResourceUrl"
-					[alt]="file.fileName"
+					[alt]="file.name"
 					[style]="iconSizeStyle"
 				/>
 				<figcaption id="figCap{{ i }}">
-					{{ file.fileName }}
+					{{ file.name }}
 				</figcaption>
 				<div class="rename-textbox" id="renameContainer{{ i }}">
 					<form [formGroup]="renameForm" (ngSubmit)="isFormDirty()">

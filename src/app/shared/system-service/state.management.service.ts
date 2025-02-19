@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-	AppState,
-	BaseState,
-	WindowState,
-} from 'src/app/system-files/state/state.interface';
+import { AppState, BaseState, WindowState } from 'src/app/system-files/state/state.interface';
 import { StateType } from 'src/app/system-files/state/state.type';
 import { SessionManagmentService } from './session.management.service';
 @Injectable({
@@ -33,9 +29,7 @@ export class StateManagmentService {
 
 		if (type !== undefined) {
 			if (this._appStateManagmentService.has(uid)) {
-				const currStateData = this._appStateManagmentService.get(
-					uid
-				) as BaseState[];
+				const currStateData = this._appStateManagmentService.get(uid) as BaseState[];
 				if (type == StateType.App) {
 					currStateData[StateType.App] = stateData as AppState;
 				} else {
@@ -87,9 +81,7 @@ export class StateManagmentService {
 	 */
 	getState(uid: string, type?: StateType): unknown {
 		if (type !== undefined) {
-			const stateData = this._appStateManagmentService.get(
-				uid
-			) as BaseState[];
+			const stateData = this._appStateManagmentService.get(uid) as BaseState[];
 
 			if (stateData !== undefined) {
 				if (type == StateType.App) return stateData[StateType.App];
@@ -118,8 +110,7 @@ export class StateManagmentService {
 	 * remove an existing state
 	 */
 	removeState(uid: string): void {
-		if (this._appStateManagmentService.has(uid))
-			this._appStateManagmentService.delete(uid);
+		if (this._appStateManagmentService.has(uid)) this._appStateManagmentService.delete(uid);
 	}
 
 	getKeys(): string[] {

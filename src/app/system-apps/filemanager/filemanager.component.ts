@@ -1,11 +1,4 @@
-import {
-	AfterViewInit,
-	Component,
-	OnInit,
-	OnDestroy,
-	ViewChild,
-	ElementRef,
-} from '@angular/core';
+import { AfterViewInit, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import * as files from 'src/app/shared/system-service/file.service';
 import { ProcessIDService } from 'src/app/shared/system-service/process.id.service';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
@@ -26,17 +19,8 @@ import { MenuService } from 'src/app/shared/system-service/menu.services';
 	styleUrls: ['./filemanager.component.css'],
 	standalone: false,
 })
-export class FileManagerComponent
-	implements BaseComponent, OnInit, AfterViewInit, OnDestroy
-{
+export class FileManagerComponent implements BaseComponent, OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('myBounds', { static: true }) myBounds!: ElementRef;
-
-	private _processIdService: ProcessIDService;
-	private _runningProcessService: RunningProcessService;
-	private _directoryFilesEntries!: FileEntry[];
-	private _triggerProcessService: TriggerProcessService;
-	private _menuService: MenuService;
-	private _formBuilder;
 
 	private _viewByNotifySub!: Subscription;
 	private _sortByNotifySub!: Subscription;
@@ -108,71 +92,60 @@ export class FileManagerComponent
 	fileExplrMngrMenuOption = 'file-explorer-file-manager-menu';
 
 	constructor(
-		processIdService: ProcessIDService,
-		runningProcessService: RunningProcessService,
-		triggerProcessService: TriggerProcessService,
-		fileManagerService: FileManagerService,
-		formBuilder: FormBuilder,
-		menuService: MenuService
+		private processIdService: ProcessIDService,
+		private runningProcessService: RunningProcessService,
+		private triggerProcessService: TriggerProcessService,
+		private fileManagerService: FileManagerService,
+		private formBuilder: FormBuilder,
+		private menuService: MenuService
 	) {
-		this._processIdService = processIdService;
-		this._runningProcessService = runningProcessService;
-		this._triggerProcessService = triggerProcessService;
-		this._menuService = menuService;
-		this._formBuilder = formBuilder;
-
-		this.processId = this._processIdService.getNewProcessId();
-		this._runningProcessService.addProcess(this.getComponentDetail());
+		this.processId = this.processIdService.getNewProcessId();
+		this.runningProcessService.addProcess(this.getComponentDetail());
 
 		this._dirFilesUpdatedSub = files.dirFilesUpdateNotify.subscribe(() => {
-			if (files.getEventOrginator() === this.name) {
-				this.loadFilesInfoAsync();
-				files.removeEventOriginator();
+			if (files.eventOriginator === this.name) {
+				this.loadFiles();
+				files.setEventOriginator('');
 			}
 		});
 
-		this._viewByNotifySub = fileManagerService.viewByNotify.subscribe(
+		this._viewByNotifySub = fileManagerService.viewByNotify.subscribe((p) => {
+			this.changeIconsSize(p);
+		});
+		this._sortByNotifySub = fileManagerService.sortByNotify.subscribe((p) => {
+			this.sortIcons(p);
+		});
+		this._autoArrangeIconsNotifySub = fileManagerService.autoArrangeIconsNotify.subscribe(
 			(p) => {
-				this.changeIconsSize(p);
-			}
-		);
-		this._sortByNotifySub = fileManagerService.sortByNotify.subscribe(
-			(p) => {
-				this.sortIcons(p);
-			}
-		);
-		this._autoArrangeIconsNotifySub =
-			fileManagerService.autoArrangeIconsNotify.subscribe((p) => {
 				this.toggleAutoArrangeIcons(p);
-			});
-		this._autoAlignIconsNotifyBySub =
-			fileManagerService.alignIconsToGridNotify.subscribe((p) => {
+			}
+		);
+		this._autoAlignIconsNotifyBySub = fileManagerService.alignIconsToGridNotify.subscribe(
+			(p) => {
 				this.toggleAutoAlignIconsToGrid(p);
-			});
-		this._refreshNotifySub = fileManagerService.refreshNotify.subscribe(
-			() => {
-				this.refreshIcons();
 			}
 		);
-		this._showDesktopIconNotifySub =
-			fileManagerService.showDesktopIconsNotify.subscribe((p) => {
+		this._refreshNotifySub = fileManagerService.refreshNotify.subscribe(() => {
+			this.refreshIcons();
+		});
+		this._showDesktopIconNotifySub = fileManagerService.showDesktopIconsNotify.subscribe(
+			(p) => {
 				this.toggleDesktopIcons(p);
-			});
-		this._hideContextMenuSub = this._menuService.hideContextMenus.subscribe(
-			() => {
-				this.onHideIconContextMenu();
 			}
 		);
+		this._hideContextMenuSub = this.menuService.hideContextMenus.subscribe(() => {
+			this.onHideIconContextMenu();
+		});
 	}
 
 	ngOnInit(): void {
-		this.renameForm = this._formBuilder.nonNullable.group({
+		this.renameForm = this.formBuilder.nonNullable.group({
 			renameInput: '',
 		});
 	}
 
 	async ngAfterViewInit(): Promise<void> {
-		await this.loadFilesInfoAsync();
+		await this.loadFiles();
 	}
 
 	ngOnDestroy(): void {
@@ -201,32 +174,19 @@ export class FileManagerComponent
 		}
 	}
 
-	private async loadFilesInfoAsync(): Promise<void> {
-		this.files = [];
-		const directoryEntries = await files.getEntriesFromDirectoryAsync(
-			this.directory
-		);
-		this._directoryFilesEntries = files.getFileEntriesFromDirectory(
-			directoryEntries,
-			this.directory
-		);
-
-		for (let i = 0; i < directoryEntries.length; i++) {
-			const fileEntry = this._directoryFilesEntries[i];
-			const fileInfo = await files.getFileInfoAsync(fileEntry.path);
-			this.files.push(fileInfo);
-		}
+	protected async loadFiles(): Promise<void> {
+		this.files = await Array.fromAsync(files.directoryInfo(this.directory));
 	}
 
 	async runProcess(file: FileInfo): Promise<void> {
 		console.log('filemanager-runProcess:', file);
-		this._triggerProcessService.startApplication(file);
+		this.triggerProcessService.startApplication(file);
 		this.btnStyleAndValuesReset();
 
 		// console.log('what was clicked:',file.getFileName +'-----' + file.getOpensWith +'---'+ file.getCurrentPath +'----'+ file.getIcon) TBD
 		// if((file.getOpensWith === 'fileexplorer' && file.getFileName !== 'fileexplorer') && file.getFileType ==='folder'){
 		//     //this.directory = file.getCurrentPath;
-		//    // await this.loadFilesInfoAsync();
+		//    // await this.loadFiles();
 
 		//    this._triggerProcessService.startApplication(file);
 		//    this.btnStyleAndValuesReset();
@@ -248,8 +208,8 @@ export class FileManagerComponent
 
 	onShowIconContextMenu(evt: MouseEvent, file: FileInfo, id: number): void {
 		const uid = `${this.name}-${this.processId}`;
-		this._runningProcessService.addEventOriginator(uid);
-		this._menuService.hideContextMenus.next();
+		this.runningProcessService.addEventOriginator(uid);
+		this.menuService.hideContextMenus.next();
 
 		this.selectedFile = file;
 		this.showCntxtMenu = !this.showCntxtMenu;
@@ -273,16 +233,16 @@ export class FileManagerComponent
 	onCopy(): void {
 		const action = 'copy';
 		const path = this.selectedFile.currentPath;
-		this._menuService.storeData.next([path, action]);
+		this.menuService.storeData.next([path, action]);
 	}
 
 	onCut(): void {
 		const action = 'cut';
 		const path = this.selectedFile.currentPath;
-		this._menuService.storeData.next([path, action]);
+		this.menuService.storeData.next([path, action]);
 	}
 	pinIconToTaskBar(): void {
-		this._menuService.pinToTaskBar.next(this.selectedFile);
+		this.menuService.pinToTaskBar.next(this.selectedFile);
 	}
 
 	doBtnClickThings(id: number): void {
@@ -313,8 +273,7 @@ export class FileManagerComponent
 				this.isFormDirty();
 			}
 			if (this.isIconInFocusDueToPriorAction) {
-				if (this.hideCntxtMenuEvtCnt >= 0)
-					this.setBtnStyle(this.selectedElementId, false);
+				if (this.hideCntxtMenuEvtCnt >= 0) this.setBtnStyle(this.selectedElementId, false);
 
 				this.isIconInFocusDueToPriorAction = false;
 			}
@@ -347,7 +306,7 @@ export class FileManagerComponent
 
 		// to prevent an endless loop of calls,
 		if (caller !== undefined && caller === this.name) {
-			this._menuService.hideContextMenus.next();
+			this.menuService.hideContextMenus.next();
 		}
 	}
 
@@ -383,10 +342,7 @@ export class FileManagerComponent
 	onMouseLeave(id: number): void {
 		if (id != this.selectedElementId) {
 			this.removeBtnStyle(id);
-		} else if (
-			id == this.selectedElementId &&
-			!this.isIconInFocusDueToPriorAction
-		) {
+		} else if (id == this.selectedElementId && !this.isIconInFocusDueToPriorAction) {
 			this.setBtnStyle(id, false);
 		}
 	}
@@ -403,9 +359,7 @@ export class FileManagerComponent
 	}
 
 	removeBtnStyle(id: number): void {
-		const btnElement = document.getElementById(
-			`iconBtn${id}`
-		) as HTMLElement;
+		const btnElement = document.getElementById(`iconBtn${id}`) as HTMLElement;
 		if (btnElement) {
 			btnElement.style.backgroundColor = 'transparent';
 			btnElement.style.border = 'none';
@@ -413,9 +367,7 @@ export class FileManagerComponent
 	}
 
 	setBtnStyle(id: number, isMouseHover: boolean): void {
-		const btnElement = document.getElementById(
-			`iconBtn${id}`
-		) as HTMLElement;
+		const btnElement = document.getElementById(`iconBtn${id}`) as HTMLElement;
 		if (btnElement) {
 			btnElement.style.backgroundColor = 'hsl(206deg 77% 70%/20%)';
 			btnElement.style.border = '2px solid hsla(0,0%,50%,25%)';
@@ -423,8 +375,7 @@ export class FileManagerComponent
 			if (this.selectedElementId == id) {
 				isMouseHover
 					? (btnElement.style.backgroundColor = '#607c9c')
-					: (btnElement.style.backgroundColor =
-							'hsl(206deg 77% 70%/20%)');
+					: (btnElement.style.backgroundColor = 'hsl(206deg 77% 70%/20%)');
 			}
 		}
 	}
@@ -434,12 +385,11 @@ export class FileManagerComponent
 			this.files = this.files.sort((objA, objB) => objB.size - objA.size);
 		} else if (sortBy === 'Date Modified') {
 			this.files = this.files.sort(
-				(objA, objB) =>
-					objB.dateModified.getTime() - objA.dateModified.getTime()
+				(objA, objB) => objB.mtime.getTime() - objA.mtime.getTime()
 			);
 		} else if (sortBy === 'Name') {
 			this.files = this.files.sort((objA, objB) => {
-				return objA.fileName < objB.fileName ? -1 : 1;
+				return objA.name < objB.name ? -1 : 1;
 			});
 		} else if (sortBy === 'Item Type') {
 			this.files = this.files.sort((objA, objB) => {
@@ -504,14 +454,14 @@ export class FileManagerComponent
 
 	async refreshIcons(): Promise<void> {
 		this.isIconInFocusDueToPriorAction = false;
-		await this.loadFilesInfoAsync();
+		await this.loadFiles();
 	}
 
 	async onDeleteFile(): Promise<void> {
 		let result = false;
 
 		if (result) {
-			await this.loadFilesInfoAsync();
+			await this.loadFiles();
 		}
 	}
 
@@ -536,9 +486,7 @@ export class FileManagerComponent
 	showInvalidCharsToolTip(): void {
 		// get the position of the textbox
 		const toolTipID = 'invalidChars';
-		const invalidCharToolTipElement = document.getElementById(
-			toolTipID
-		) as HTMLElement;
+		const invalidCharToolTipElement = document.getElementById(toolTipID) as HTMLElement;
 		const renameContainerElement = document.getElementById(
 			`renameContainer${this.selectedElementId}`
 		) as HTMLElement;
@@ -555,9 +503,7 @@ export class FileManagerComponent
 
 	hideInvalidCharsToolTip(): void {
 		const toolTipID = 'invalidChars';
-		const invalidCharToolTipElement = document.getElementById(
-			toolTipID
-		) as HTMLElement;
+		const invalidCharToolTipElement = document.getElementById(toolTipID) as HTMLElement;
 
 		if (invalidCharToolTipElement) {
 			invalidCharToolTipElement.style.transform = `translate(${-100000}px, ${100000}px)`;
@@ -599,7 +545,7 @@ export class FileManagerComponent
 
 		if (renameContainerElement) {
 			renameContainerElement.style.display = 'block';
-			this.currentIconName = this.selectedFile.fileName;
+			this.currentIconName = this.selectedFile.name;
 			this.renameForm.setValue({
 				renameInput: this.currentIconName,
 			});
@@ -653,12 +599,6 @@ export class FileManagerComponent
 	}
 
 	private getComponentDetail(): Process {
-		return new Process(
-			this.processId,
-			this.name,
-			this.icon,
-			this.hasWindow,
-			this.type
-		);
+		return new Process(this.processId, this.name, this.icon, this.hasWindow, this.type);
 	}
 }

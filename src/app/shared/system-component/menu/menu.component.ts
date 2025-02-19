@@ -1,10 +1,4 @@
-import {
-	Component,
-	Input,
-	OnChanges,
-	SimpleChanges,
-	OnDestroy,
-} from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { NestedMenu, GeneralMenu } from './menu.item';
 import { MenuService } from '../../system-service/menu.services';
 import { Subscription } from 'rxjs';
@@ -35,14 +29,14 @@ export class MenuComponent implements OnChanges, OnDestroy {
 
 	constructor(menuService: MenuService) {
 		this._menuService = menuService;
-		this.isPasteActive = this._menuService.getPasteState();
+		this.isPasteActive = this._menuService.pasteActive;
 		this._storeDataSub = this._menuService.storeData.subscribe((p) => {
 			const path = p[0];
 			const actions = p[1];
 
-			this._menuService.setPath(path);
-			this._menuService.setActions(actions);
-			this._menuService.setPasteState(true);
+			this._menuService.path = path;
+			this._menuService.actions = actions;
+			this._menuService.pasteActive = true;
 		});
 	}
 

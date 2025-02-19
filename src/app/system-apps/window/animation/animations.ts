@@ -1,11 +1,4 @@
-import {
-	trigger,
-	transition,
-	state,
-	animate,
-	style,
-	keyframes,
-} from '@angular/animations';
+import { trigger, transition, state, animate, style, keyframes } from '@angular/animations';
 
 // Routable animations
 export const openCloseAnimation = trigger('openClose', [

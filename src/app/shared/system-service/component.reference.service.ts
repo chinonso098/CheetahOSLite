@@ -10,10 +10,7 @@ export class ComponentReferenceService {
 		this._componentsReferences = new Map<number, ComponentRef<unknown>>();
 	}
 
-	addComponentReference(
-		processId: number,
-		componentToAdd: ComponentRef<unknown>
-	): void {
+	addComponentReference(processId: number, componentToAdd: ComponentRef<unknown>): void {
 		this._componentsReferences.set(processId, componentToAdd);
 	}
 

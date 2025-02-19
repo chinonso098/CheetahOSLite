@@ -16,8 +16,7 @@ export class ProcessIDService {
 		let pid = 0;
 		pid = this.generateProcessId();
 
-		while (this._activeProcessIds.includes(pid))
-			pid = this.generateProcessId();
+		while (this._activeProcessIds.includes(pid)) pid = this.generateProcessId();
 
 		this._activeProcessIds.push(pid);
 		return pid;

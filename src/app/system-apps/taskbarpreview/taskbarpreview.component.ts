@@ -1,19 +1,7 @@
-import {
-	Component,
-	Input,
-	OnChanges,
-	SimpleChanges,
-	AfterViewInit,
-} from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import { RunningProcessService } from 'src/app/shared/system-service/running.process.service';
 import { TaskBarPreviewImage } from './taskbar.preview';
-import {
-	trigger,
-	state,
-	style,
-	animate,
-	transition,
-} from '@angular/animations';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 @Component({
 	selector: 'cos-taskbarpreview',
 	templateUrl: './taskbarpreview.component.html',
@@ -53,9 +41,7 @@ export class TaskBarPreviewComponent implements OnChanges, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		setTimeout(() => {
-			this.componentImages = this._runningProcessService.getProcessImages(
-				this.name
-			);
+			this.componentImages = this._runningProcessService.getProcessImages(this.name);
 			this.shortAppInfo();
 		}, this.SECONDS_DELAY);
 	}
@@ -85,9 +71,7 @@ export class TaskBarPreviewComponent implements OnChanges, AfterViewInit {
 	}
 
 	showTaskBarPreviewContextMenu(evt: MouseEvent, pid: number): void {
-		console.log(
-			'I will implement the TaskBarPreview Context Window.........later'
-		);
+		console.log('I will implement the TaskBarPreview Context Window.........later');
 	}
 
 	setWindowToFocus(pid: number): void {

@@ -7,9 +7,9 @@ import { Process } from 'src/app/system-files/process';
 	providedIn: 'root',
 })
 export class MenuService {
-	private _isPasteActive = false;
-	private _path = 'NOPATH';
-	private _actions = '';
+	public pasteActive = false;
+	public path = 'NOPATH';
+	public actions = '';
 
 	pinToTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
 	unPinFromTaskBar: Subject<FileInfo> = new Subject<FileInfo>();
@@ -22,28 +22,4 @@ export class MenuService {
 	keepTaskBarMenu: Subject<void> = new Subject<void>();
 	hideContextMenus: Subject<void> = new Subject<void>();
 	storeData: Subject<string[]> = new Subject<string[]>();
-
-	setPasteState(isActive: boolean): void {
-		this._isPasteActive = isActive;
-	}
-
-	getPasteState(): boolean {
-		return this._isPasteActive;
-	}
-
-	setPath(path: string): void {
-		this._path = path;
-	}
-
-	getPath(): string {
-		return this._path;
-	}
-
-	setActions(action: string): void {
-		this._actions = action;
-	}
-
-	getActions(): string {
-		return this._actions;
-	}
 }
